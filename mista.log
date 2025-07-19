@@ -449,3 +449,7 @@ google.api_core.exceptions.ResourceExhausted: 429 You exceeded your current quot
 2025-07-16 17:21:10,466 - INFO - --- MISTA BRAIN: Інструментальна модель успішно ініціалізована. ---
 2025-07-16 18:29:25,815 - INFO - --- MISTA BRAIN: Чат-модель успішно ініціалізована. ---
 2025-07-16 18:29:25,816 - INFO - --- MISTA BRAIN: Інструментальна модель успішно ініціалізована. ---
+2025-07-19 16:08:17,808 - INFO - file_cache is only supported with oauth2client<4.0.0
+2025-07-19 16:08:23,878 - INFO - Успішно завантажено 30 листів.
+2025-07-19 16:08:38,071 - INFO - file_cache is only supported with oauth2client<4.0.0
+2025-07-19 16:08:44,277 - INFO - Успішно завантажено 30 листів.
