@@ -41,7 +41,7 @@
 
             // --- MI$TA CORE LOGIC ---
             const SUPABASE_URL = 'https://ktragdmkrdhuhwohfczz.supabase.co';
-            const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmFnZG1rcmRodWh3b2hmY3p6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MjQ5NjczOSwiZXhwIjoyMDY4MDcyNzM5fQ.F9xj7Nnzt1zWyPY9bek8II6E2gTtXmZqXywx0Z9qrwQ';
+            const SUPABASE_KEY = const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmFnZG1rcmRodWh3b2hmY3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MzMzODEsImV4cCI6MjA2ODUwOTM4MX0.NKgEci1-5rJkOF6DTsAL3u9gVFC80va-Uy9z-UU09jk';            ;
             const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
             // --- CHAT ---
