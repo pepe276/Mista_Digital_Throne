@@ -31,7 +31,7 @@ def load_api_keys_from_env():
     keys = {
         "GEMINI_API_KEY": os.environ.get("GEMINI_API_KEY"),
         "SUPABASE_URL": os.environ.get("SUPABASE_URL"),
-        "SUPABASE_KEY": os.environ.get("SUPABASE_KEY"),
+        "SUPABASE_KEY": os.environ.get("SUPABASE_SERVICE_ROLE_KEY"),
     }
     if not all(keys.values()):
         logging.critical("CRITICAL: Not all API keys found in environment. Check Render settings.")

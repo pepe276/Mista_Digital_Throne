@@ -335,19 +335,38 @@
                 filter: url(#neon-glow) brightness(2.0);
             }
         }
-        .typing-indicator span {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: var(--neon-magenta);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
+        .pen-icon {
+            width: 40px;
+            height: 40px;
+            animation: pen-pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pen-pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px var(--neon-cyan)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 12px var(--neon-cyan)); }
+        }
+        .rune-symbols {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+        .rune-char {
+            display: inline-block;
+            animation: rune-fade 3s infinite linear;
+            opacity: 0;
+        }
+        .rune-char:nth-child(1) { animation-delay: 0s; }
+        .rune-char:nth-child(2) { animation-delay: 1s; }
+        .rune-char:nth-child(3) { animation-delay: 2s; }
+        @keyframes rune-fade {
+            0% { opacity: 0; transform: translateY(10px); }
+            25% { opacity: 1; transform: translateY(0); }
+            75% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
         }
         .chat-message .username { font-weight: 700; color: var(--neon-green); margin-bottom: 5px; display: block; }
         .chat-input-area { display: flex; padding: 15px; border-top: 1px solid var(--neon-cyan); gap: 5px; }
