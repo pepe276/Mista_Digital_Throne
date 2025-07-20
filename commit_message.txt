@@ -1,0 +1,6 @@
+feat: Final commit with runic animations and all fixes
+
+- Implements all requested runic and typing animations in index.html.
+- Corrects the Supabase client to use the public anonymous key, fixing all connection errors.
+- Implements a robust backend that uses environment variables, translates news, and handles errors gracefully.
+- This is the definitive version that fulfills all previous requests.
