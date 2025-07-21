@@ -42,7 +42,7 @@ def load_api_keys_from_env():
 api_keys = load_api_keys_from_env()
 GEMINI_API_KEY = api_keys.get("GEMINI_API_KEY")
 SUPABASE_URL = api_keys.get("SUPABASE_URL")
-SUPABASE_KEY = api_keys.get("SUPABASE_SERVICE_ROLE_KEY")
+SUPABASE_KEY = api_keys.get("SUPABASE_KEY")
 
 print(f"DEBUG: SUPABASE_URL found: {bool(SUPABASE_URL)}")
 print(f"DEBUG: SUPABASE_KEY found: {bool(SUPABASE_KEY)}")
