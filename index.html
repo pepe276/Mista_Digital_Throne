@@ -815,7 +815,9 @@ function initChat() {
         DOMElements.usernamePrompt.style.display = 'none';
         DOMElements.chatBody.style.display = 'flex';
         DOMElements.chatInputArea.style.display = 'flex';
-        // RLS/History features are disabled until policies are configured
+        initializeSupabaseChannel();
+        loadInitialMessages();
+        listenForMessages();
     };
 
     if (AppState.username && AppState.userId) {
@@ -848,10 +850,71 @@ function displayChatMessage(username, message, isMe) {
     DOMElements.chatBody.scrollTop = DOMElements.chatBody.scrollHeight;
 }
 
-// RLS DISABLED FUNCTIONS
-async function loadInitialMessages() { console.warn("History loading is disabled."); }
-function initializeSupabaseChannel() { console.warn("Realtime features are disabled."); }
-function listenForMessages() { console.warn("Realtime listener is disabled."); }
+async function loadInitialMessages() {
+    try {
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        data.forEach(msg => displayChatMessage(msg.username, msg.message, msg.user_id === AppState.userId));
+    } catch (error) {
+        console.error("Error loading initial messages:", error);
+        displayChatMessage('MI$TA', 'Не вдалося завантажити історію чату. Спробуй пізніше.', false);
+    }
+}
+
+function initializeSupabaseChannel() {
+    if (AppState.supabaseChannel) {
+        AppState.supabaseChannel.unsubscribe();
+    }
+    AppState.supabaseChannel = supabase.channel('chat_room', {
+        config: {
+            presence: {
+                key: AppState.userId
+            }
+        }
+    });
+
+    AppState.supabaseChannel
+        .on('presence', { event: 'sync' }, () => {
+            const presenceState = AppState.supabaseChannel.presenceState();
+            const uniqueUsers = new Set();
+            for (const channelName in presenceState) {
+                for (const user of presenceState[channelName]) {
+                    uniqueUsers.add(user.username);
+                }
+            }
+            DOMElements.activeUsersCount.textContent = `Активних користувачів: ${uniqueUsers.size}`;
+        })
+        .on('presence', { event: 'join' }, ({ newPresences }) => {
+            newPresences.forEach(p => {
+                displayChatMessage('MI$TA', `${p.username} приєднався до мережі.`, false);
+            });
+        })
+        .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+            leftPresences.forEach(p => {
+                displayChatMessage('MI$TA', `${p.username} покинув мережу.`, false);
+            });
+        })
+        .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+                const { error } = await AppState.supabaseChannel.track({ username: AppState.username, user_id: AppState.userId });
+                if (error) console.error("Error tracking presence:", error);
+            }
+        });
+}
+
+function listenForMessages() {
+    supabase
+        .from('messages')
+        .on('INSERT', payload => {
+            if (payload.new.user_id !== AppState.userId) { // Only display messages from others
+                displayChatMessage(payload.new.username, payload.new.message, false);
+            }
+        })
+        .subscribe();
+}
 
 
 function startTypingAnimation() {
