@@ -44,6 +44,9 @@ GEMINI_API_KEY = api_keys.get("GEMINI_API_KEY")
 SUPABASE_URL = api_keys.get("SUPABASE_URL")
 SUPABASE_KEY = api_keys.get("SUPABASE_SERVICE_ROLE_KEY")
 
+logging.info(f"DEBUG: SUPABASE_URL found: {bool(SUPABASE_URL)}")
+logging.info(f"DEBUG: SUPABASE_KEY found: {bool(SUPABASE_KEY)}")
+
 # Initialize Supabase Client
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
