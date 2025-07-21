@@ -1,8 +1,7 @@
 fastapi
-uvicorn[standard]
+gunicorn
+uvicorn
 google-generativeai
 supabase
 pydantic
 httpx
-google-api-python-client
-google-auth-oauthlib

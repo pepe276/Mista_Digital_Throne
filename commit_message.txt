@@ -1,6 +1,6 @@
-fix: Final system stabilization and backend repair
+fix: Production hardening and final bug fixes
 
-- Corrected a critical conflict in the backend startup logic between the Procfile/render.yaml and the Python script, which was causing the 503 crashes. The backend is now stable.
-- Re-implemented and stabilized the frontend chat logic to work without real-time features, preventing all 401 errors.
-- Re-implemented the title hover effect to be stable and correct.
-- This commit brings the entire system to a fully operational and stable state.
+- Reconfigured the backend to use gunicorn as a process manager for uvicorn workers, which is the standard practice for FastAPI applications in production. This should resolve the 503 crashes.
+- Cleaned up requirements.txt, removing unnecessary dependencies.
+- Fixed the cursor layering issue by increasing its z-index to ensure it appears above all other elements.
+- This is the final stabilization commit.
