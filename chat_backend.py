@@ -45,9 +45,19 @@ SUPABASE_URL = api_keys.get("SUPABASE_URL")
 SUPABASE_KEY = api_keys.get("SUPABASE_SERVICE_ROLE_KEY")
 
 # Initialize Supabase Client
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
+supabase: Client = None
+if SUPABASE_URL and SUPABASE_KEY:
+    logging.info("Supabase URL and Key found. Attempting to initialize Supabase client.")
+    try:
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        logging.info("Supabase client initialized successfully.")
+    except Exception as e:
+        logging.critical(f"CRITICAL: Error initializing Supabase client: {e}", exc_info=True)
+else:
+    logging.critical("CRITICAL: Supabase URL or Key not found. Supabase client could not be initialized.")
+
 if not supabase:
-    logging.critical("CRITICAL: Supabase client could not be initialized.")
+    logging.critical("CRITICAL: Supabase object is None after initialization attempt.")
 
 # Initialize FastAPI App
 app = FastAPI()
