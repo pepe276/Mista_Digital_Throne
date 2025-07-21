@@ -136,17 +136,21 @@ async def chat_endpoint(chat_message: ChatMessage):
         return {"response": "Мовчання? Цікава тактика. Але зі мною не спрацює."}
 
     try:
-        # Generate AI response first
+        logging.info(f"Attempting to generate AI response for user '{chat_message.username}' (ID: {chat_message.user_id}).")
         response = await chat_model.generate_content_async(chat_message.message)
         ai_response_text = response.text.strip()
+        logging.info(f"Successfully generated AI response. Response length: {len(ai_response_text)} characters.")
 
-        # Save both valid messages to Supabase
         user_msg = {'user_id': chat_message.user_id, 'username': chat_message.username, 'message': chat_message.message}
         ai_msg = {'user_id': 'mista-ai-entity', 'username': 'MI$TA', 'message': ai_response_text}
         
+        logging.info("Attempting to save messages to Supabase.")
         insert_response = supabase.table('messages').insert([user_msg, ai_msg]).execute()
+        
         if insert_response.data is None and insert_response.error is not None:
              logging.error(f"Supabase insert error: {insert_response.error}")
+        else:
+            logging.info("Messages successfully saved to Supabase.")
 
         return {"response": ai_response_text}
     except Exception as e:
