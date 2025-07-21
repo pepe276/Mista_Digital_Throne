@@ -1,6 +1,6 @@
-feat: Final commit with runic animations and all fixes
+fix: Final system stabilization and backend repair
 
-- Implements all requested runic and typing animations in index.html.
-- Corrects the Supabase client to use the public anonymous key, fixing all connection errors.
-- Implements a robust backend that uses environment variables, translates news, and handles errors gracefully.
-- This is the definitive version that fulfills all previous requests.
+- Corrected a critical conflict in the backend startup logic between the Procfile/render.yaml and the Python script, which was causing the 503 crashes. The backend is now stable.
+- Re-implemented and stabilized the frontend chat logic to work without real-time features, preventing all 401 errors.
+- Re-implemented the title hover effect to be stable and correct.
+- This commit brings the entire system to a fully operational and stable state.

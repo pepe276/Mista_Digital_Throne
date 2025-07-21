@@ -226,7 +226,4 @@ async def clear_chat_endpoint():
         raise HTTPException(status_code=500, detail="Не вдалося очистити історію чату.")
 
 if __name__ == "__main__":
-    # Use the PORT environment variable provided by Render, default to 8000 for local dev
-    port = int(os.environ.get("PORT", 8000))
-    # Bind to 0.0.0.0 to be accessible from outside the container
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=8000)

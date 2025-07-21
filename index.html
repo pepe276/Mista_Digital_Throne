@@ -785,9 +785,8 @@ function initRuneHover() {
     // Find the h1 inside, which is the base layer for text
     const baseLayer = title.querySelector('h1.glitch-layers');
     if (!baseLayer) return;
-
-    const originalHTML = baseLayer.innerHTML; // Keep the original spans
     
+    // This approach is safer as it doesn't re-create the whole innerHTML
     baseLayer.addEventListener('mouseover', (e) => {
         if (e.target.tagName === 'SPAN') {
             const span = e.target;
@@ -816,8 +815,7 @@ function initChat() {
         DOMElements.usernamePrompt.style.display = 'none';
         DOMElements.chatBody.style.display = 'flex';
         DOMElements.chatInputArea.style.display = 'flex';
-        // loadInitialMessages(); // RLS DISABLED
-        // initializeSupabaseChannel(); // RLS DISABLED
+        // RLS/History features are disabled until policies are configured
     };
 
     if (AppState.username && AppState.userId) {
@@ -850,18 +848,11 @@ function displayChatMessage(username, message, isMe) {
     DOMElements.chatBody.scrollTop = DOMElements.chatBody.scrollHeight;
 }
 
-async function loadInitialMessages() {
-    // RLS DISABLED - This function is no longer called
-    console.warn("History loading is disabled due to RLS policies.");
-}
+// RLS DISABLED FUNCTIONS
+async function loadInitialMessages() { console.warn("History loading is disabled."); }
+function initializeSupabaseChannel() { console.warn("Realtime features are disabled."); }
+function listenForMessages() { console.warn("Realtime listener is disabled."); }
 
-function initializeSupabaseChannel() {
-    // RLS DISABLED - This function is no longer called
-    console.warn("Realtime features are disabled due to RLS policies.");
-}
-function listenForMessages() {
-    // RLS DISABLED - This function is no longer called
-}
 
 function startTypingAnimation() {
     stopTypingAnimation(); // Clear any existing animation
@@ -910,12 +901,18 @@ async function sendMessage() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: messageText, user_id: AppState.userId, username: AppState.username })
         });
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.status}`);
-        }
-        const data = await response.json();
+        
         stopTypingAnimation();
-        displayChatMessage('MI$TA', data.response, false); // Display response directly
+
+        if (!response.ok) {
+            // Display a generic error from the backend if the request fails
+            const errorData = await response.json().catch(() => ({ detail: 'Невідома помилка сервера.' }));
+            displayChatMessage('MI$TA', `Помилка: ${errorData.detail || response.statusText}`, false);
+            return;
+        }
+        
+        const data = await response.json();
+        displayChatMessage('MI$TA', data.response, false);
     } catch (err) {
         console.error("Send message error:", err);
         stopTypingAnimation();
