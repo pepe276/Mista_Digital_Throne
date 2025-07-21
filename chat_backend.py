@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from supabase import create_client, Client
+from datetime import datetime, timedelta # <--- ДОДАНО
 
 # --- Basic Configuration ---
 logging.basicConfig(
@@ -82,6 +83,9 @@ class ChatMessage(BaseModel):
     user_id: str
     username: str
 
+class BrainstormPrompt(BaseModel):
+    prompt: str
+
 # --- Helper Functions ---
 async def clear_old_messages():
     """Deletes messages from Supabase that are older than 24 hours."""
@@ -141,6 +145,31 @@ async def chat_endpoint(chat_message: ChatMessage):
         logging.error(f"Error in /chat endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/brainstorm")
+async def brainstorm_endpoint(prompt_data: BrainstormPrompt):
+    if not tool_model:
+        raise HTTPException(status_code=503, detail="Мій інструментальний мозок не ініціалізовано.")
+    if not prompt_data.prompt or not prompt_data.prompt.strip():
+        return {"response": "Порожня ідея? Ти знущаєшся? Дай мені хоч щось."}
+
+    try:
+        system_instruction = (
+            "Ти — генератор ідей у стилі кіберпанк. Твоя задача — взяти концепцію користувача і розширити її "
+            "в короткий, але ємкий опис проєкту. Використовуй зухвалу, технологічну та трохи містичну манеру мови. "
+            "Говори як цифрова відьма, що бачить код реальності. "
+            "Відповідь має бути у форматі простого тексту."
+        )
+        # Створюємо нову модель з інструкцією для цього конкретного завдання
+        brainstorm_model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash-latest', 
+            system_instruction=system_instruction
+        )
+        response = await brainstorm_model.generate_content_async(prompt_data.prompt)
+        return {"response": response.text.strip()}
+    except Exception as e:
+        logging.error(f"Error in /brainstorm endpoint: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Мій генератор ідей перегрівся. Спробуй пізніше.")
+
 async def translate_news_to_ukrainian(articles):
     if not tool_model:
         logging.warning("Tool model not initialized, skipping translation.")
@@ -197,7 +226,7 @@ async def clear_chat_endpoint():
         raise HTTPException(status_code=500, detail="Не вдалося очистити історію чату.")
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    # Use the PORT environment variable provided by Render, default to 8000 for local dev
+    port = int(os.environ.get("PORT", 8000))
+    # Bind to 0.0.0.0 to be accessible from outside the container
+    uvicorn.run(app, host="0.0.0.0", port=port)
