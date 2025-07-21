@@ -906,11 +906,11 @@ function initializeSupabaseChannel() {
 }
 
 function listenForMessages() {
-    supabase
-        .from('messages')
-        .on('INSERT', payload => {
-            if (payload.new.user_id !== AppState.userId) { // Only display messages from others
-                displayChatMessage(payload.new.username, payload.new.message, false);
+    AppState.supabaseChannel
+        .on('broadcast', { event: 'chat_message' }, ({ payload }) => {
+            // Only display messages from others, as self messages are displayed immediately
+            if (payload.user_id !== AppState.userId) {
+                displayChatMessage(payload.username, payload.message, false);
             }
         })
         .subscribe();

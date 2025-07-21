@@ -164,6 +164,20 @@ async def chat_endpoint(chat_message: ChatMessage):
              logging.error(f"Supabase insert error: {insert_response.error}")
         else:
             logging.info("Messages successfully saved to Supabase.")
+            # Broadcast the message to the chat_room channel
+            try:
+                supabase.realtime.channel('chat_room').send({
+                    "type": "broadcast",
+                    "event": "chat_message",
+                    "payload": {
+                        "username": chat_message.username,
+                        "message": chat_message.message,
+                        "user_id": chat_message.user_id # Include user_id for frontend to differentiate
+                    }
+                })
+                logging.info("Message broadcasted successfully.")
+            except Exception as broadcast_e:
+                logging.error(f"Error broadcasting message: {broadcast_e}", exc_info=True)
 
         return {"response": ai_response_text}
     except Exception as e:
