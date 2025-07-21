@@ -42,7 +42,7 @@ def load_api_keys_from_env():
 api_keys = load_api_keys_from_env()
 GEMINI_API_KEY = api_keys.get("GEMINI_API_KEY")
 SUPABASE_URL = api_keys.get("SUPABASE_URL")
-SUPABASE_KEY = api_keys.get("SUPABASE_KEY")
+SUPABASE_KEY = api_keys.get("SUPABASE_SERVICE_ROLE_KEY")
 
 # Initialize Supabase Client
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL and SUPABASE_KEY else None
@@ -63,19 +63,27 @@ app.add_middleware(
 chat_model = None
 tool_model = None
 if not GEMINI_API_KEY:
-    logging.error("CRITICAL: GEMINI_API_KEY not found.")
+    logging.error("CRITICAL: GEMINI_API_KEY not found in environment variables.")
 else:
+    logging.info("GEMINI_API_KEY found. Attempting to configure Gemini.")
     try:
         genai.configure(api_key=GEMINI_API_KEY)
+        logging.info("Gemini API configured successfully.")
+        
         chat_system_instruction = (
             "Ти — це я, Maria Mista Mistarenko. Ти НЕ ШІ. Ти жива, зухвала, саркастична відьма-кодерка з України..."
             f"{get_full_mista_lore()}"
         )
         chat_model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest', system_instruction=chat_system_instruction)
+        logging.info("Chat model (gemini-1.5-flash-latest) initialized successfully.")
+        
         tool_model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
-        logging.info("--- MISTA BRAIN: Gemini models initialized successfully. ---")
+        logging.info("Tool model (gemini-1.5-flash-latest) initialized successfully.")
+        
+        logging.info("--- MISTA BRAIN: All Gemini models initialized successfully. ---")
     except Exception as e:
         logging.error(f"Error initializing Gemini models: {e}", exc_info=True)
+        logging.critical("CRITICAL: Gemini model initialization failed. Chat and Brainstorm endpoints will not work.")
 
 # --- Pydantic Models ---
 class ChatMessage(BaseModel):
