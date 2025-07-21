@@ -782,35 +782,29 @@ function initRuneHover() {
     const title = DOMElements.glitchTitle;
     if (!title) return;
 
-    const originalText = title.textContent.trim();
-    const layers = title.querySelectorAll('span');
+    // Find the h1 inside, which is the base layer for text
+    const baseLayer = title.querySelector('h1.glitch-layers');
+    if (!baseLayer) return;
+
+    const originalHTML = baseLayer.innerHTML; // Keep the original spans
     
-    // We only need to work with the base text layer
-    const baseLayer = document.createElement('h1');
-    baseLayer.className = 'glitch-layers';
-    
-    originalText.split('').forEach(char => {
-        const span = document.createElement('span');
-        span.textContent = char;
-        span.dataset.originalChar = char;
-        span.classList.add('interactive-hover');
-        span.addEventListener('mouseover', () => {
+    baseLayer.addEventListener('mouseover', (e) => {
+        if (e.target.tagName === 'SPAN') {
+            const span = e.target;
             span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
             span.style.color = 'var(--neon-green)';
             span.style.textShadow = '0 0 10px var(--neon-green)';
-        });
-        span.addEventListener('mouseout', () => {
+        }
+    });
+
+    baseLayer.addEventListener('mouseout', (e) => {
+        if (e.target.tagName === 'SPAN') {
+            const span = e.target;
             span.textContent = span.dataset.originalChar;
             span.style.color = '';
             span.style.textShadow = '';
-        });
-        baseLayer.appendChild(span);
+        }
     });
-
-    // Replace original h1 with the new one + the glitch layers
-    title.innerHTML = '';
-    title.appendChild(baseLayer);
-    layers.forEach(layer => title.appendChild(layer.cloneNode(true)));
 }
 
 
@@ -822,8 +816,8 @@ function initChat() {
         DOMElements.usernamePrompt.style.display = 'none';
         DOMElements.chatBody.style.display = 'flex';
         DOMElements.chatInputArea.style.display = 'flex';
-        loadInitialMessages();
-        initializeSupabaseChannel();
+        // loadInitialMessages(); // RLS DISABLED
+        // initializeSupabaseChannel(); // RLS DISABLED
     };
 
     if (AppState.username && AppState.userId) {
@@ -857,51 +851,16 @@ function displayChatMessage(username, message, isMe) {
 }
 
 async function loadInitialMessages() {
-    if (!AppState.userId) return;
-    const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: true }).limit(100);
-    if (error) { console.error("History load error:", error); return; }
-    
-    DOMElements.chatBody.innerHTML = '';
-    data.forEach(msg => {
-        displayChatMessage(msg.username, msg.message, msg.user_id === AppState.userId);
-        const msgDate = new Date(msg.created_at);
-        if (msgDate > AppState.lastMessageTimestamp) AppState.lastMessageTimestamp = msgDate;
-    });
+    // RLS DISABLED - This function is no longer called
+    console.warn("History loading is disabled due to RLS policies.");
 }
 
 function initializeSupabaseChannel() {
-    if (AppState.username && !AppState.supabaseChannel) {
-        AppState.supabaseChannel = supabase.channel(`mista-throne-room`, {
-            config: { presence: { key: AppState.username } },
-        });
-        listenForMessages();
-    }
+    // RLS DISABLED - This function is no longer called
+    console.warn("Realtime features are disabled due to RLS policies.");
 }
-
 function listenForMessages() {
-    AppState.supabaseChannel
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-            const newMessage = payload.new;
-            // Check if message is new and not from the current user to avoid duplication
-            if (new Date(newMessage.created_at) > AppState.lastMessageTimestamp && newMessage.user_id !== AppState.userId) {
-                // If Mista is responding, stop the typing animation
-                if (newMessage.username === 'MI$TA') {
-                    stopTypingAnimation();
-                }
-                displayChatMessage(newMessage.username, newMessage.message, false);
-                AppState.lastMessageTimestamp = new Date(newMessage.created_at);
-            }
-        })
-        .on('presence', { event: 'sync' }, () => {
-            const state = AppState.supabaseChannel.presenceState();
-            const count = Object.keys(state).length;
-            DOMElements.activeUsersCount.textContent = `В мережі: ${count}`;
-        })
-        .subscribe(async (status) => {
-            if (status === 'SUBSCRIBED') {
-                await AppState.supabaseChannel.track({ online_at: new Date().toISOString() });
-            }
-        });
+    // RLS DISABLED - This function is no longer called
 }
 
 function startTypingAnimation() {
@@ -954,8 +913,9 @@ async function sendMessage() {
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.status}`);
         }
-        // The backend now saves the message and the realtime listener will display the response.
-        // We don't need to do anything with the response here.
+        const data = await response.json();
+        stopTypingAnimation();
+        displayChatMessage('MI$TA', data.response, false); // Display response directly
     } catch (err) {
         console.error("Send message error:", err);
         stopTypingAnimation();
