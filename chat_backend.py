@@ -44,16 +44,16 @@ GEMINI_API_KEY = api_keys.get("GEMINI_API_KEY")
 SUPABASE_URL = api_keys.get("SUPABASE_URL")
 SUPABASE_KEY = api_keys.get("SUPABASE_SERVICE_ROLE_KEY")
 
-logging.info(f"DEBUG: SUPABASE_URL found: {bool(SUPABASE_URL)}")
-logging.info(f"DEBUG: SUPABASE_KEY found: {bool(SUPABASE_KEY)}")
+print(f"DEBUG: SUPABASE_URL found: {bool(SUPABASE_URL)}")
+print(f"DEBUG: SUPABASE_KEY found: {bool(SUPABASE_KEY)}")
 
 # Initialize Supabase Client
 supabase: Client = None
 if SUPABASE_URL and SUPABASE_KEY:
-    logging.info("Supabase URL and Key found. Attempting to initialize Supabase client.")
+    print("Supabase URL and Key found. Attempting to initialize Supabase client.")
     try:
         supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
-        logging.info("Supabase client initialized successfully.")
+        print("Supabase client initialized successfully.")
     except Exception as e:
         logging.critical(f"CRITICAL: Error initializing Supabase client: {e}", exc_info=True)
 else:
