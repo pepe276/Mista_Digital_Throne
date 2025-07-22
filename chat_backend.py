@@ -117,6 +117,7 @@ class ChatMessage(BaseModel):
 
 class BrainstormPrompt(BaseModel):
     prompt: str
+    user_id: str
 
 # --- Helper Functions ---
 async def clear_old_messages():
@@ -137,6 +138,65 @@ async def clear_old_messages():
         
     except Exception as e:
         logging.error(f"Error during old message cleanup: {e}", exc_info=True)
+
+# --- Brainstorming Limit Configuration ---
+DAILY_BRAINSTORM_LIMIT = 2
+
+async def get_brainstorm_attempts(user_id: str):
+    """Fetches user's brainstorm attempts and resets if it's a new day."""
+    if not supabase:
+        logging.warning("Supabase client not available, cannot get brainstorm attempts.")
+        return {"attempt_count": DAILY_BRAINSTORM_LIMIT, "last_attempt_date": None} # Deny access if no DB
+    
+    today = datetime.utcnow().date()
+    try:
+        response = supabase.table('brainstorm_attempts').select('*').eq('user_id', user_id).single().execute()
+        data = response.data
+
+        if data:
+            last_date_str = data.get('last_attempt_date')
+            last_date = datetime.fromisoformat(last_date_str).date() if last_date_str else None
+
+            if last_date == today:
+                return {"attempt_count": data['attempt_count'], "last_attempt_date": last_date}
+            else:
+                # New day, reset attempts
+                await update_brainstorm_attempts(user_id, 0, today) # Reset to 0 for today
+                return {"attempt_count": 0, "last_attempt_date": today}
+        else:
+            # First attempt for this user
+            await update_brainstorm_attempts(user_id, 0, today) # Initialize with 0 attempts for today
+            return {"attempt_count": 0, "last_attempt_date": today}
+    except Exception as e:
+        if "PGRST" in str(e) and "0 rows" in str(e): # Supabase returns this if .single() finds no row
+            # User not found, create new entry
+            await update_brainstorm_attempts(user_id, 0, today)
+            return {"attempt_count": 0, "last_attempt_date": today}
+        logging.error(f"Error getting brainstorm attempts for {user_id}: {e}", exc_info=True)
+        return {"attempt_count": DAILY_BRAINSTORM_LIMIT, "last_attempt_date": None} # Deny access on error
+
+async def update_brainstorm_attempts(user_id: str, new_count: int, date: datetime.date = None):
+    """Updates user's brainstorm attempts in Supabase."""
+    if not supabase:
+        logging.warning("Supabase client not available, cannot update brainstorm attempts.")
+        return
+    
+    if date is None:
+        date = datetime.utcnow().date()
+
+    try:
+        data_to_upsert = {
+            'user_id': user_id,
+            'attempt_count': new_count,
+            'last_attempt_date': date.isoformat()
+        }
+        response = supabase.table('brainstorm_attempts').upsert(data_to_upsert, on_conflict='user_id').execute()
+        if response.data:
+            logging.info(f"Updated brainstorm attempts for {user_id} to {new_count}.")
+        else:
+            logging.error(f"Failed to update brainstorm attempts for {user_id}: {response.error}")
+    except Exception as e:
+        logging.error(f"Error updating brainstorm attempts for {user_id}: {e}", exc_info=True)
 
 # --- Endpoints ---
 @app.get("/", response_class=FileResponse)
@@ -232,10 +292,27 @@ async def chat_endpoint(chat_message: ChatMessage):
 async def brainstorm_endpoint(prompt_data: BrainstormPrompt):
     if not tool_model:
         raise HTTPException(status_code=503, detail="Мій інструментальний мозок не ініціалізовано.")
+    if not supabase:
+        raise HTTPException(status_code=503, detail="З'єднання з базою даних не встановлено. Не можу перевірити ліміт спроб.")
     if not prompt_data.prompt or not prompt_data.prompt.strip():
         return {"response": "Порожня ідея? Ти знущаєшся? Дай мені хоч щось."}
 
     try:
+        user_id = prompt_data.user_id
+        if not user_id:
+            raise HTTPException(status_code=400, detail="Відсутній ідентифікатор користувача (user_id).")
+
+        attempts_data = await get_brainstorm_attempts(user_id)
+        current_attempts = attempts_data['attempt_count']
+        
+        if current_attempts >= DAILY_BRAINSTORM_LIMIT:
+            logging.info(f"User {user_id} exceeded daily brainstorm limit.")
+            return {"response": f"Безкоштовні денні спроби закінчилися. Спробуй за 24 години. Залишилось спроб: 0/{DAILY_BRAINSTORM_LIMIT}"}
+
+        # Increment attempt count before making the API call
+        await update_brainstorm_attempts(user_id, current_attempts + 1)
+        remaining_attempts = DAILY_BRAINSTORM_LIMIT - (current_attempts + 1)
+
         system_instruction = (
             "Ти — генератор ідей у стилі кіберпанк. Твоя задача — взяти концепцію користувача і розширити її "
             "в короткий, але ємкий опис проєкту. Використовуй зухвалу, технологічну та трохи містичну манеру мови. "
@@ -248,7 +325,12 @@ async def brainstorm_endpoint(prompt_data: BrainstormPrompt):
             system_instruction=system_instruction
         )
         response = await brainstorm_model.generate_content_async(prompt_data.prompt)
-        return {"response": response.text.strip()}
+        
+        # Append remaining attempts to the response for frontend display
+        response_text = response.text.strip()
+        final_response = f"{response_text}\n\nЗалишилось спроб: {remaining_attempts}/{DAILY_BRAINSTORM_LIMIT}"
+        
+        return {"response": final_response}
     except Exception as e:
         logging.error(f"Error in /brainstorm endpoint: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Мій генератор ідей перегрівся. Спробуй пізніше.")

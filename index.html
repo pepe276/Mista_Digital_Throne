@@ -1238,6 +1238,11 @@ function initBrainstorm() {
             return;
         }
 
+        if (!AppState.userId) {
+            DOMElements.brainstormOutput.textContent = "Будь ласка, введіть свій позивний у чаті, щоб використовувати Мозковий Штурм.";
+            return;
+        }
+
         // Check cache first
         if (brainstormCache[prompt]) {
             DOMElements.brainstormOutput.textContent = brainstormCache[prompt];
@@ -1253,9 +1258,13 @@ function initBrainstorm() {
             const response = await fetch(`${BACKEND_URL}/brainstorm`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt })
+                body: JSON.stringify({ prompt, user_id: AppState.userId })
             });
-            if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ detail: 'Невідома помилка сервера.' }));
+                DOMElements.brainstormOutput.textContent = `Помилка: ${errorData.detail || response.statusText}`;
+                return;
+            }
             const data = await response.json();
             
             // Store in cache and display
