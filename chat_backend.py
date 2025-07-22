@@ -5,6 +5,8 @@ import logging
 import httpx
 import time
 import json
+import random
+import asyncio
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
@@ -186,6 +188,12 @@ async def chat_endpoint(chat_message: ChatMessage):
         # Create a new model instance with the dynamic system instruction for each request
         # This ensures the system instruction is always fresh and specific to the user
         dynamic_chat_model = genai.GenerativeModel(model_name='gemini-2.5-flash', system_instruction=current_system_instruction)
+        
+        # Add random delay to simulate human-like response time and reduce API calls
+        delay_seconds = random.uniform(20, 60)
+        logging.info(f"Simulating human-like delay for {delay_seconds:.2f} seconds.")
+        await asyncio.sleep(delay_seconds)
+
         response = await dynamic_chat_model.generate_content_async(chat_message.message)
         ai_response_text = response.text.strip()
         logging.info(f"Successfully generated AI response. Response length: {len(ai_response_text)} characters.")
