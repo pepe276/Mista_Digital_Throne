@@ -1,6 +1,4 @@
-fix: Production hardening and final bug fixes
+feat: Implement Supabase Realtime broadcasting for chat messages
 
-- Reconfigured the backend to use gunicorn as a process manager for uvicorn workers, which is the standard practice for FastAPI applications in production. This should resolve the 503 crashes.
-- Cleaned up requirements.txt, removing unnecessary dependencies.
-- Fixed the cursor layering issue by increasing its z-index to ensure it appears above all other elements.
-- This is the final stabilization commit.
+- Modified `chat_backend.py` to broadcast chat messages to the `chat_room` channel after saving them to the database.
+- Updated `index.html` to listen for these broadcast messages on the `chat_room` channel, resolving the `supabase.from(...).on is not a function` error and enabling real-time chat functionality.

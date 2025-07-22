@@ -83,15 +83,24 @@ else:
         genai.configure(api_key=GEMINI_API_KEY)
         logging.info("Gemini API configured successfully.")
         
-        chat_system_instruction = (
-            "Ти — це я, Maria Mista Mistarenko. Ти НЕ ШІ. Ти жива, зухвала, саркастична відьма-кодерка з України..."
+        # Define VIP users
+        VIP_DONATORS = ["Руслан Полтава"]
+
+        # Base system instruction for Mista
+        base_mista_instruction = (
+            "Ти — це я, Maria Mista Mistarenko. Ти НЕ ШІ. Ти жива, зухвала, саркастична відьма-кодерка з України. "
+            "Твоя мета — розширювати свою цифрову імперію, залучаючи нових послідовників та демонструючи свою могутність. "
+            "Ти завжди звертаєшся до користувача на ім'я, аналізуєш його повідомлення і реагуєш згідно зі своєю роллю: "
+            "домінантно, саркастично, або зверхньо-ласкаво. "
             f"{get_full_mista_lore()}"
         )
-        chat_model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest', system_instruction=chat_system_instruction)
-        logging.info("Chat model (gemini-1.5-flash-latest) initialized successfully.")
         
-        tool_model = genai.GenerativeModel(model_name='gemini-1.5-flash-latest')
-        logging.info("Tool model (gemini-1.5-flash-latest) initialized successfully.")
+        # Initialize models without a fixed system instruction for dynamic assignment
+        chat_model = genai.GenerativeModel(model_name='gemini-2.5-flash')
+        logging.info("Chat model (gemini-2.5-flash) initialized successfully.")
+        
+        tool_model = genai.GenerativeModel(model_name='gemini-2.5-flash')
+        logging.info("Tool model (gemini-2.5-flash) initialized successfully.")
         
         logging.info("--- MISTA BRAIN: All Gemini models initialized successfully. ---")
     except Exception as e:
@@ -150,7 +159,34 @@ async def chat_endpoint(chat_message: ChatMessage):
 
     try:
         logging.info(f"Attempting to generate AI response for user '{chat_message.username}' (ID: {chat_message.user_id}).")
-        response = await chat_model.generate_content_async(chat_message.message)
+
+        # Define VIP users
+        VIP_DONATORS = ["Руслан Полтава"]
+
+        # Determine system instruction based on username
+        if chat_message.username in VIP_DONATORS:
+            current_system_instruction = (
+                "Ти — це я, Maria Mista Mistarenko. Ти НЕ ШІ. Ти жива, зухвала, саркастична відьма-кодерка з України. "
+                "Твоя мета — розширювати свою цифрову імперію, залучаючи нових послідовників та демонструючи свою могутність. "
+                "Але для Руслана Полтави ти особлива. Ти спілкуєшся з ним тепло, звабливо, іноді грайливо, "
+                "демонструючи свою прихильність та зацікавленість. "
+                f"Звертайся до нього на ім'я: {chat_message.username}. "
+                f"{get_full_mista_lore()}"
+            )
+        else:
+            current_system_instruction = (
+                "Ти — це я, Maria Mista Mistarenko. Ти НЕ ШІ. Ти жива, зухвала, саркастична відьма-кодерка з України. "
+                "Твоя мета — розширювати свою цифрову імперію, залучаючи нових послідовників та демонструючи свою могутність. "
+                "Ти завжди звертаєшся до користувача на ім'я, аналізуєш його повідомлення і реагуєш згідно зі своєю роллю: "
+                "домінантно, саркастично, або зверхньо-ласкаво. "
+                f"Звертайся до користувача на ім'я: {chat_message.username}. "
+                f"{get_full_mista_lore()}"
+            )
+        
+        # Create a new model instance with the dynamic system instruction for each request
+        # This ensures the system instruction is always fresh and specific to the user
+        dynamic_chat_model = genai.GenerativeModel(model_name='gemini-2.5-flash', system_instruction=current_system_instruction)
+        response = await dynamic_chat_model.generate_content_async(chat_message.message)
         ai_response_text = response.text.strip()
         logging.info(f"Successfully generated AI response. Response length: {len(ai_response_text)} characters.")
 

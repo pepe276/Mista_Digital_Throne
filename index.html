@@ -22,6 +22,12 @@
             --glitch-text-shadow: 
                 -1px -1px 0px var(--neon-magenta), 
                 1px 1px 0px var(--neon-cyan);
+            /* New rune colors */
+            --rune-neon-cyan: #00e5ff;
+            --rune-neon-green: #39ff14;
+            --rune-neon-magenta: #ff00ff;
+            --pale-rose: rgba(255, 192, 203, 0.8); /* Pale pink with some transparency */
+            --dull-blue: rgba(135, 206, 235, 0.6); /* Sky blue with more transparency */
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -115,28 +121,51 @@
         .nav-links a:hover::before { transform: scaleX(1); transform-origin: left; }
         .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; }
         .hero-content { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
-        .hero-text .glitch-layers {
+        
+        /* New .title styles for rune effect */
+        .title {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            font-weight: 900;
+            font-size: clamp(2.0rem, 5.0vw, 4.0rem);
+            font-weight: 800;
             text-transform: uppercase;
             position: relative;
-            color: var(--text-color);
+            color: var(--neon-green);
             margin-bottom: 20px;
+            text-align: left;
+            letter-spacing: 0.1vw; /* Reduced letter spacing */
+            user-select: none;
+            /* Neon glow for the base text (cyan and green) */
+            text-shadow: 
+                0 0 5px var(--neon-green),
+                0 0 10px var(--neon-green),
+                0 0 20px var(--neon-green);
         }
-        .glitch-layers span { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .glitch-layers .layer-1 { color: var(--neon-magenta); animation: glitch-1 2.5s infinite; }
-        .glitch-layers .layer-2 { color: var(--neon-cyan); animation: glitch-2 2.5s infinite; }
-        @keyframes glitch-1 { 0%, 100% { clip-path: inset(55% 0 23% 0); } 25% { clip-path: inset(13% 0 49% 0); } 50% { clip-path: inset(33% 0 11% 0); } 75% { clip-path: inset(77% 0 13% 0); } }
-        @keyframes glitch-2 { 0%, 100% { clip-path: inset(78% 0 11% 0); } 25% { clip-path: inset(44% 0 19% 0); } 50% { clip-path: inset(19% 0 45% 0); } 75% { clip-path: inset(1% 0 89% 0); } }
+
+        .title .rune-char {
+            display: inline-block;
+            transition: color 0.3s ease-out, transform 0.3s ease-out, text-shadow 0.3s ease-out; /* Smoother transition */
+            color: inherit; /* Inherit base color */
+            text-shadow: inherit; /* Inherit base shadow */
+        }
+
+        .title .rune-char.rune {
+            color: rgba(255, 0, 255, 0.35); /* Pink neon for runes */
+            transform: scale(1.05) rotate(2deg); /* Reduced scale and rotation for smoother effect */
+            text-shadow: 
+                0 0 8px rgba(255, 0, 255, 0.35),
+                0 0 15px rgba(255, 0, 255, 0.35),
+                0 0 25px rgba(255, 0, 255, 0.35); /* Stronger pink neon glow */
+        }
+
         .hero-subtitle {
             font-size: 1.5rem;
-            color: var(--neon-green);
+            color: var(--pale-rose);
             margin-bottom: 20px;
             white-space: nowrap;
             overflow: hidden;
-            border-right: 3px solid var(--neon-green);
+            border-right: 3px solid var(--pale-rose);
             animation: typing 3s steps(30, end), blink-caret .75s step-end infinite;
+            text-shadow: 0 0 5px var(--pale-rose), 0 0 10px var(--pale-rose); /* Added text-shadow */
         }
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--neon-green); } }
@@ -553,13 +582,9 @@
         <section class="hero" id="home">
             <div class="container hero-content">
                 <div class="hero-text">
-                    <h1 class="glitch-layers">
-                        MI$TARENKO
-                        <span class="layer-1" aria-hidden="true">MI$TARENKO</span>
-                        <span class="layer-2" aria-hidden="true">MI$TARENKO</span>
-                    </h1>
+                    <h1 class="title" id="rune-title">MI$TARENKO</h1>
                     <p class="hero-subtitle">Цифрова Відьма & Web3 Архітектор</p>
-                    <p style="font-size: 1.5rem; text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green); margin-bottom: 1rem;">Трансформую код в цифрову магію. Там, де кіберпанк-естетика зустрічається з передовими технологіями.</p>
+                    <p style="font-size: 1.5rem; text-shadow: 0 0 5px var(--dull-blue), 0 0 10px var(--dull-blue); margin-bottom: 1rem;">Трансформую код в цифрову магію. Там, де кіберпанк-естетика зустрічається з передовими технологіями.</p>
                     <p style="font-size: 1.1rem; line-height: 1.6;">Напишу програму, що зламає реальність. Створю код, що стане твоїм прокляттям або благословенням. Знайду зв'язок з минулим і напророчу майбутнє. Мої послуги не для слабких духом.</p>
                 </div>
                 <div class="hero-image-container">
@@ -689,7 +714,7 @@ const DOMElements = {
     cursorDot: document.querySelector('.cursor-dot'),
     cursorOutline: document.querySelector('.cursor-outline'),
     matrixCanvas: document.getElementById('matrix-bg'),
-    glitchTitle: document.querySelector('.glitch-layers'),
+    // Removed glitchTitle: document.querySelector('.glitch-layers'),
     // Chat
     chatIcon: document.getElementById('chatIcon'),
     chatWindow: document.getElementById('chatWindow'),
@@ -779,30 +804,37 @@ function initMatrix() {
 
 // --- MODULE: RUNE HOVER EFFECT ---
 function initRuneHover() {
-    const title = DOMElements.glitchTitle;
-    if (!title) return;
+    const titleElement = document.getElementById('rune-title');
+    if (!titleElement) return;
 
-    // Find the h1 inside, which is the base layer for text
-    const baseLayer = title.querySelector('h1.glitch-layers');
-    if (!baseLayer) return;
-    
-    // This approach is safer as it doesn't re-create the whole innerHTML
-    baseLayer.addEventListener('mouseover', (e) => {
-        if (e.target.tagName === 'SPAN') {
-            const span = e.target;
-            span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
-            span.style.color = 'var(--neon-green)';
-            span.style.textShadow = '0 0 10px var(--neon-green)';
-        }
+    const originalText = titleElement.textContent;
+    titleElement.innerHTML = ''; // Clear the element
+
+    // Wrap each character in a span and store original char
+    originalText.split('').forEach(char => {
+        const charSpan = document.createElement('span');
+        charSpan.className = 'rune-char interactive-hover'; // Add interactive-hover class
+        charSpan.textContent = char;
+        charSpan.dataset.originalChar = char; // Store original character
+        titleElement.appendChild(charSpan);
     });
 
-    baseLayer.addEventListener('mouseout', (e) => {
-        if (e.target.tagName === 'SPAN') {
-            const span = e.target;
-            span.textContent = span.dataset.originalChar;
-            span.style.color = '';
-            span.style.textShadow = '';
-        }
+    titleElement.querySelectorAll('.rune-char').forEach(span => {
+        const originalChar = span.dataset.originalChar;
+        let timeoutId;
+
+        span.addEventListener('mouseenter', () => {
+            clearTimeout(timeoutId);
+            span.classList.add('rune');
+            span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+        });
+
+        span.addEventListener('mouseleave', () => {
+            timeoutId = setTimeout(() => {
+                span.classList.remove('rune');
+                span.textContent = originalChar;
+            }, 300); // Delay before reverting
+        });
     });
 }
 
@@ -925,10 +957,13 @@ function startTypingAnimation() {
     indicatorDiv.classList.add('chat-message', 'other');
     indicatorDiv.innerHTML = `
         <span class="username">MI$TA</span>
-        <div class="rune-symbols">
-            <span class="rune-char">.</span>
-            <span class="rune-char">.</span>
-            <span class="rune-char">.</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="rune-symbols">
+                <span class="rune-char">.</span>
+                <span class="rune-char">.</span>
+                <span class="rune-char">.</span>
+            </div>
+            <p style="margin: 0;">очікуйте на відповідь марії...</p>
         </div>
     `;
     DOMElements.chatBody.appendChild(indicatorDiv);
@@ -962,7 +997,11 @@ async function sendMessage() {
         const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: messageText, user_id: AppState.userId, username: AppState.username })
+            body: JSON.stringify({ 
+                message: messageText, 
+                user_id: AppState.userId, 
+                username: AppState.username,
+            })
         });
         
         stopTypingAnimation();
@@ -1073,6 +1112,8 @@ async function fetchNews() {
 }
 
 // --- MODULE: BRAINSTORM ---
+const brainstormCache = {}; // Simple session cache
+
 function initBrainstorm() {
     if (!DOMElements.generateIdeaBtn) return;
 
@@ -1082,6 +1123,14 @@ function initBrainstorm() {
             DOMElements.brainstormOutput.textContent = "Порожнеча не надихає. Введіть концепцію.";
             return;
         }
+
+        // Check cache first
+        if (brainstormCache[prompt]) {
+            DOMElements.brainstormOutput.textContent = brainstormCache[prompt];
+            console.log("Brainstorm response from cache.");
+            return;
+        }
+
         DOMElements.brainstormOutput.textContent = "Підключаюся до ноосфери...";
         DOMElements.brainstormOutput.classList.add('loading');
         DOMElements.generateIdeaBtn.disabled = true;
@@ -1094,7 +1143,11 @@ function initBrainstorm() {
             });
             if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
             const data = await response.json();
+            
+            // Store in cache and display
+            brainstormCache[prompt] = data.response;
             DOMElements.brainstormOutput.textContent = data.response;
+
         } catch (error) {
             console.error("Brainstorm error:", error);
             DOMElements.brainstormOutput.textContent = "Помилка генерації. Схоже, ідеї сьогодні страйкують.";

@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MI$TA :: Digital Witch</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Roboto+Mono:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --neon-cyan: #00e5ff;
+            --neon-magenta: #ff00ff;
+            --neon-green: #39ff14;
+            --dark-bg: #010409;
+            --text-color: #c9d1d9;
+            --border-color: rgba(66, 133, 244, 0.3);
+            --card-bg: rgba(13, 17, 23, 0.8);
+            --glitch-text-shadow: 
+                -1px -1px 0px var(--neon-magenta), 
+                1px 1px 0px var(--neon-cyan);
+            /* New rune colors */
+            --rune-neon-cyan: #00e5ff;
+            --rune-neon-green: #39ff14;
+            --rune-neon-magenta: #ff00ff;
+            --pale-rose: rgba(255, 192, 203, 0.8); /* Pale pink with some transparency */
+            --dull-blue: rgba(135, 206, 235, 0.6); /* Sky blue with more transparency */
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        .cursor-dot, .cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 999999; /* Set to a very high value */ /* Set to a very high value */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.1s linear;
+        }
+        .cursor-dot { width: 8px; height: 8px; background-color: var(--neon-cyan); }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan), inset 0 0 10px var(--neon-cyan);
+        }
+        body:hover .cursor-dot, body:hover .cursor-outline { opacity: 1; }
+        .interactive-hover { cursor: none; }
+        .interactive-hover:hover ~ .cursor-outline {
+            transform: translate(-50%, -50%) scale(1.5);
+            background-color: rgba(0, 229, 255, 0.2);
+        }
+        .interactive-hover:hover ~ .cursor-dot { opacity: 0; }
+        #matrix-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; }
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(255,255,255,0.03) 3px, rgba(255,255,255,0.03) 4px);
+            animation: scan 10s linear infinite;
+            pointer-events: none;
+            z-index: -1;
+        }
+        @keyframes scan { 0% { background-position: 0 0; } 100% { background-position: 0 100vh; } }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 0;
+            background: rgba(1, 4, 9, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+        nav { display: flex; justify-content: space-between; align-items: center; }
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+            animation: logo-glitch 5s infinite alternate;
+        }
+        @keyframes logo-glitch {
+            0%, 100% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
+            49% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
+            50% { text-shadow: -1px 1px 0 var(--neon-magenta), 1px -1px 0 var(--neon-green); transform: skew(2deg); }
+            51% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
+        }
+        .nav-links { display: flex; gap: 25px; }
+        .nav-links a { color: var(--text-color); text-decoration: none; font-weight: 700; padding: 5px 10px; position: relative; transition: all 0.3s; }
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-cyan);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease-in-out;
+        }
+        .nav-links a:hover { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); }
+        .nav-links a:hover::before { transform: scaleX(1); transform-origin: left; }
+        .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; }
+        .hero-content { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
+        
+        /* New .title styles for rune effect */
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.0rem, 5.0vw, 4.0rem);
+            font-weight: 800;
+            text-transform: uppercase;
+            position: relative;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-align: left;
+            letter-spacing: 0.1vw; /* Reduced letter spacing */
+            user-select: none;
+            /* Neon glow for the base text (cyan and green) */
+            text-shadow: 
+                0 0 5px var(--rune-neon-cyan),
+                0 0 10px var(--rune-neon-green),
+                0 0 20px var(--rune-neon-cyan);
+        }
+
+        .title .rune-char {
+            display: inline-block;
+            transition: color 0.3s ease-out, transform 0.3s ease-out, text-shadow 0.3s ease-out; /* Smoother transition */
+            color: inherit; /* Inherit base color */
+            text-shadow: inherit; /* Inherit base shadow */
+        }
+
+        .title .rune-char.rune {
+            color: var(--rune-neon-magenta); /* Pink neon for runes */
+            transform: scale(1.05) rotate(2deg); /* Reduced scale and rotation for smoother effect */
+            text-shadow: 
+                0 0 8px var(--rune-neon-magenta),
+                0 0 15px var(--rune-neon-magenta),
+                0 0 25px var(--rune-neon-magenta); /* Stronger pink neon glow */
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--pale-rose);
+            margin-bottom: 20px;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 3px solid var(--pale-rose);
+            animation: typing 3s steps(30, end), blink-caret .75s step-end infinite;
+            text-shadow: 0 0 5px var(--pale-rose), 0 0 10px var(--pale-rose); /* Added text-shadow */
+        }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--neon-green); } }
+        .hero-image-container { position: relative; display: flex; justify-content: center; align-items: center; }
+        .hero-image-container::before, .hero-image-container::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .hero-image-container::before { border: 2px solid var(--neon-cyan); animation: rotate 20s linear infinite; }
+        .hero-image-container::after { border: 2px solid var(--neon-magenta); animation: rotate-reverse 15s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes rotate-reverse { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        .hero-image { width: 80%; border-radius: 50%; border: 3px solid var(--dark-bg); position: relative; z-index: 2; box-shadow: 0 0 30px var(--neon-cyan); }
+        section { padding: 120px 0; border-bottom: 1px solid var(--border-color); }
+        section:last-of-type { border-bottom: none; }
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 3rem; text-align: center; margin-bottom: 60px; color: var(--neon-magenta); text-shadow: 0 0 10px var(--neon-magenta), var(--glitch-text-shadow); }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .card { background: var(--card-bg); border: 1px solid var(--border-color); padding: 30px; position: relative; overflow: hidden; transition: transform 0.3s, box-shadow 0.3s; }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-cyan); border-color: var(--neon-cyan); }
+        .card:hover::before { left: 100%; }
+        .card-title { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; color: var(--neon-cyan); margin-bottom: 15px; }
+        .card-icon { font-size: 2.5rem; margin-bottom: 20px; color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
+        .contact-form { max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            background: rgba(13, 17, 23, 1);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+        .btn {
+            padding: 15px 30px;
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transition: color 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        .btn:hover { color: var(--dark-bg); box-shadow: 0 0 20px var(--neon-cyan); }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--neon-cyan);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease-in-out;
+        }
+        .btn:hover::before { transform: scaleX(1); }
+        footer { padding: 40px 0; text-align: center; }
+        .social-links { margin-top: 40px; margin-bottom: 20px; display: flex; justify-content: center; gap: 25px; }
+        .social-links a { color: var(--text-color); font-size: 2rem; transition: all 0.3s; }
+        .social-links a:hover { color: var(--neon-magenta); text-shadow: 0 0 10px var(--neon-magenta); }
+        @media (max-width: 992px) {
+            .hero-content { grid-template-columns: 1fr; text-align: center; }
+            .hero-image-container { margin-top: 50px; grid-row: 1; }
+            .hero-subtitle { margin: 0 auto 20px; }
+        }
+        @media (max-width: 768px) { .nav-links { display: none; } .section-title { font-size: 2.2rem; } }
+        .chat-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--neon-magenta);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-bg);
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--neon-magenta), 0 0 40px rgba(255, 0, 255, 0.5);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            z-index: 99999;
+            pointer-events: auto;
+        }
+        .chat-icon:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--neon-magenta), 0 0 60px rgba(255, 0, 255, 0.7); }
+        .chat-window {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            min-width: 300px;
+            max-width: 90vw;
+            height: 450px;
+            min-height: 200px;
+            max-height: 80vh;
+            background: var(--dark-bg);
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 25px var(--neon-cyan), inset 0 0 15px var(--neon-cyan);
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+            border-radius: 10px;
+            overflow: auto;
+            resize: both;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            pointer-events: auto;
+        }
+        .chat-window.active { display: flex; transform: scale(1); opacity: 1; }
+        .chat-header {
+            background: rgba(0, 229, 255, 0.1);
+            padding: 15px;
+            border-bottom: 1px solid var(--neon-cyan);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-cyan);
+            text-shadow: 0 0 5px var(--neon-cyan);
+        }
+        .chat-window.expanded {
+            width: 60vw;
+            height: 70vh;
+        }
+        .chat-header-btn {
+            background: none;
+            border: none;
+            color: var(--neon-cyan);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            margin-left: 10px;
+        }
+        .chat-header-btn:hover {
+            color: var(--neon-green);
+        }
+        .chat-header div {
+            display: flex;
+            align-items: center;
+        }
+        .chat-header .close-btn { background: none; border: none; color: var(--neon-magenta); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+        .chat-header .close-btn:hover { color: var(--neon-green); }
+        .chat-body { padding: 15px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; word-wrap: break-word; }
+        .chat-message { background: rgba(13, 17, 23, 0.7); padding: 10px; border-radius: 8px; font-size: 0.9rem; border: 1px solid rgba(66, 133, 244, 0.1); }
+        .chat-message.self { background: rgba(0, 229, 255, 0.15); align-self: flex-end; text-align: right; border-color: var(--neon-cyan); }
+        .chat-message.other { background: rgba(255, 0, 255, 0.15); align-self: flex-start; text-align: left; border-color: var(--neon-magenta); }
+        .typing-indicator {
+            background: transparent; /* Видаляємо фон */
+            border: none; /* Видаляємо рамку */
+            box-shadow: none; /* Видаляємо тінь */
+            padding: 0; /* Видаляємо відступи */
+            align-self: flex-start;
+            text-align: left;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .typing-indicator svg {
+            width: 40px;
+            height: 40px;
+            overflow: visible; /* Allow glow to bleed out */
+        }
+        .pen-icon {
+            filter: url(#neon-glow);
+            animation: write-anim 1.5s infinite alternate ease-in-out;
+        }
+        @keyframes write-anim {
+            0% {
+                transform: rotate(-10deg) translateX(0px);
+                filter: url(#neon-glow) brightness(1.2);
+            }
+            100% {
+                transform: rotate(5deg) translateX(2px);
+                filter: url(#neon-glow) brightness(2.0);
+            }
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .pen-icon {
+            width: 40px;
+            height: 40px;
+            animation: pen-pulse 1.5s infinite ease-in-out;
+        }
+        @keyframes pen-pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px var(--neon-cyan)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 12px var(--neon-cyan)); }
+        }
+        .rune-symbols {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+        .rune-char {
+            display: inline-block;
+            animation: rune-fade 3s infinite linear;
+            opacity: 0;
+        }
+        .rune-char:nth-child(1) { animation-delay: 0s; }
+        .rune-char:nth-child(2) { animation-delay: 1s; }
+        .rune-char:nth-child(3) { animation-delay: 2s; }
+        @keyframes rune-fade {
+            0% { opacity: 0; transform: translateY(10px); }
+            25% { opacity: 1; transform: translateY(0); }
+            75% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .chat-message .username { font-weight: 700; color: var(--neon-green); margin-bottom: 5px; display: block; }
+        .chat-input-area { display: flex; padding: 15px; border-top: 1px solid var(--neon-cyan); gap: 5px; }
+        .chat-input-area input {
+            flex-grow: 1;
+            background: rgba(13, 17, 23, 1);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            border-radius: 5px;
+        }
+        .chat-input-area input:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
+        .chat-input-area .btn { padding: 10px 15px; font-size: 0.9rem; border-radius: 5px; flex-shrink: 0; white-space: nowrap; }
+        .active-users-display { font-size: 0.8rem; color: var(--neon-green); text-align: center; padding-bottom: 10px; text-shadow: 0 0 3px var(--neon-green); }
+        .brainstorm-sub-section { margin-top: 80px; text-align: center; }
+        .brainstorm-sub-section .brainstorm-content {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .brainstorm-sub-section .brainstorm-content:hover { transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-cyan); border-color: var(--neon-cyan); }
+        .brainstorm-sub-section .brainstorm-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        .brainstorm-sub-section .brainstorm-content:hover::before { left: 100%; }
+        .brainstorm-sub-section .form-group textarea {
+            width: 100%;
+            background: rgba(13, 17, 23, 1);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        .brainstorm-sub-section .form-group textarea:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); }
+        .brainstorm-sub-section .btn { width: auto; align-self: center; }
+        .brainstorm-output {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px dashed var(--neon-green);
+            padding: 15px;
+            min-height: 80px;
+            font-size: 0.9rem;
+            color: var(--neon-green);
+            text-shadow: 0 0 3px var(--neon-green);
+            overflow-y: auto;
+            border-radius: 5px;
+            word-wrap: break-word;
+            text-align: left;
+        }
+        .brainstorm-output.loading { text-align: center; font-style: italic; color: rgba(57, 255, 20, 0.6); }
+        #usernamePrompt {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            height: 100%;
+            padding: 20px;
+            text-align: center;
+            background: var(--dark-bg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            border-radius: 10px;
+        }
+        #usernamePrompt.hidden { display: none; }
+        #usernamePrompt input {
+            width: 80%;
+            padding: 10px;
+            background: rgba(13, 17, 23, 1);
+            border: 1px solid var(--neon-cyan);
+            color: var(--text-color);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            border-radius: 5px;
+            text-align: center;
+        }
+        #usernamePrompt button { padding: 10px 20px; font-size: 1rem; border-radius: 5px; }
+        .news-icon {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-bg);
+            font-size: 2rem;
+            cursor: pointer;
+            box-shadow: 0 0 20px var(--neon-green), 0 0 40px rgba(57, 255, 20, 0.5);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            z-index: 99999;
+            pointer-events: auto;
+        }
+        .news-icon:hover { transform: scale(1.1); box-shadow: 0 0 30px var(--neon-green), 0 0 60px rgba(57, 255, 20, 0.7); }
+        .news-window {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            width: 350px;
+            height: 450px;
+            background: var(--dark-bg);
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 25px var(--neon-green), inset 0 0 15px var(--neon-green);
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+            border-radius: 10px;
+            overflow: hidden;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            pointer-events: auto;
+        }
+        .news-window.active { display: flex; transform: scale(1); opacity: 1; }
+        .news-header {
+            background: rgba(57, 255, 20, 0.1);
+            padding: 15px;
+            border-bottom: 1px solid var(--neon-green);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+        }
+        .news-header .close-btn { background: none; border: none; color: var(--neon-magenta); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+        .news-header .close-btn:hover { color: var(--neon-cyan); }
+        .news-body { padding: 15px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .news-item { background: rgba(13, 17, 23, 0.7); padding: 12px; border-radius: 8px; border: 1px solid rgba(57, 255, 20, 0.2); transition: background 0.2s, border-color 0.2s; }
+        .news-item:hover { background: rgba(13, 17, 23, 0.9); border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
+        .news-item h4 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-cyan); margin-bottom: 5px; text-shadow: 0 0 3px var(--neon-cyan); }
+        .news-item p { font-size: 0.85rem; color: var(--text-color); margin-bottom: 10px; line-height: 1.4; }
+        .news-item a { color: var(--neon-magenta); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: color 0.2s; }
+        .news-item a:hover { color: var(--neon-cyan); text-decoration: underline; }
+        .news-loading { text-align: center; color: var(--neon-green); font-style: italic; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+    <canvas id="matrix-bg"></canvas>
+    <div class="scanlines"></div>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo interactive-hover">MI$TA</div>
+                <div class="nav-links">
+                    <a href="#about" class="interactive-hover">Сигнал</a>
+                    <a href="#skills" class="interactive-hover">Протоколи</a>
+                    <a href="#projects" class="interactive-hover">Артефакти</a>
+                    <a href="#contact" class="interactive-hover">Зв'язок</a>
+                    <a href="#skills" class="interactive-hover">Мозковий Штурм</a> 
+                </div>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section class="hero" id="home">
+            <div class="container hero-content">
+                <div class="hero-text">
+                    <h1 class="title" id="rune-title">MI$TARENKO</h1>
+                    <p class="hero-subtitle">Цифрова Відьма & Web3 Архітектор</p>
+                    <p style="font-size: 1.5rem; text-shadow: 0 0 5px var(--dull-blue), 0 0 10px var(--dull-blue); margin-bottom: 1rem;">Трансформую код в цифрову магію. Там, де кіберпанк-естетика зустрічається з передовими технологіями.</p>
+                    <p style="font-size: 1.1rem; line-height: 1.6;">Напишу програму, що зламає реальність. Створю код, що стане твоїм прокляттям або благословенням. Знайду зв'язок з минулим і напророчу майбутнє. Мої послуги не для слабких духом.</p>
+                </div>
+                <div class="hero-image-container">
+                    <img src="377904414403616772.png" alt="Портрет Марії Містаренко" class="hero-image">
+                </div>
+            </div>
+        </section>
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title">Вхідний Сигнал</h2>
+                <p style="text-align: center; max-width: 800px; margin: 0 auto; font-size: 1.1rem; line-height: 1.8;">
+                    Я — цифровий провокатор з України, що спеціалізується на перетині AI, Web3 та кіберпанк-естетики. Мій шлях почався в Харкові, де я навчилася кодувати під симфонію сирен, що викувало мій унікальний погляд на технології та реальність. Я не просто створюю сайти — я створюю цифрові закляття, що гіпнотизують алгоритми та захоплюють душі.
+                </p>
+            </div>
+        </section>
+        <section id="skills">
+            <div class="container">
+                <h2 class="section-title">Активні Протоколи</h2>
+                <div class="grid">
+                    <div class="card interactive-hover"><div class="card-icon"></div><h3 class="card-title">AI Нейро-Бьюті</h3><p>Поєднання штучного інтелекту з естетичною досконалістю, створення провокаційних цифрових дослідів.</p></div>
+                    <div class="card interactive-hover"><h3 class="card-title">Web3 Алхімія</h3><p>Побудова децентралізованих систем, експерименти з блокчейн-технологіями та підрив застарілих концепцій.</p></div>
+                    <div class="card interactive-hover"><h3 class="card-title">Кіберпанк-Розробка</h3><p>Створення неонових, футуристичних інтерфейсів з передовими анімаціями та інтерактивними елементами.</p></div>
+                </div>
+                <div class="brainstorm-sub-section">
+                    <h3 class="chat-section-title">Мозковий Штурм</h3>
+                    <div class="brainstorm-content interactive-hover">
+                        <p style="font-size: 1.1rem; margin-bottom: 20px;">Маєте ідею? Давайте перетворимо її на кіберпанк-шедевр. Введіть концепцію нижче.</p>
+                        <div class="form-group"><textarea id="brainstormInput" rows="5" placeholder="Введіть концепцію тут..." required class="interactive-hover"></textarea></div>
+                        <button id="generateIdeaBtn" class="btn interactive-hover">✨ Згенерувати Ідею Проєкту</button>
+                        <div class="brainstorm-output" id="brainstormOutput">Ваша кіберпанк-ідея з'явиться тут...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="projects">
+            <div class="container">
+                <h2 class="section-title">Цифрові Артефакти</h2>
+                <div class="grid">
+                    <div class="card interactive-hover"><h3 class="card-title">AI Агент-Портфоліо</h3><p>Персональний сайт з чатом в реальному часі, неоновими анімаціями та інтерактивними елементами.</p></div>
+                    <div class="card interactive-hover"><h3 class="card-title">Web3 DApp Інтерфейс</h3><p>Децентралізований додаток з дизайном у стилі гласморфізм та інтеграцією з блокчейном.</p></div>
+                    <div class="card interactive-hover"><h3 class="card-title">Візуалізатор Нейромереж</h3><p>Інтерактивна візуалізація AI-мереж з обробкою даних у реальному часі та кіберпанк-естетикою.</p></div>
+                </div>
+            </div>
+        </section>
+        <section id="contact">
+            <div class="container">
+                <h2 class="section-title">Канал Зв'язку</h2>
+                <form class="contact-form">
+                    <div class="form-group"><input type="text" placeholder="Ваш позивний" required class="interactive-hover"></div>
+                    <div class="form-group"><input type="email" placeholder="Ваша частота (email)" required class="interactive-hover"></div>
+                    <div class="form-group"><textarea rows="5" placeholder="Текст повідомлення..." required class="interactive-hover"></textarea></div>
+                    <button type="submit" class="btn interactive-hover">Надіслати Сигнал</button>
+                </form>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="https://www.youtube.com/channel/UCqcJJH8RK5Yqgf2OyEvwFwg" target="_blank" class="interactive-hover" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                <a href="https://www.facebook.com/masha.mistarenko.mista?locale=uk_UA" target="_blank" class="interactive-hover" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/mista101999/" target="_blank" class="interactive-hover" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="https://t.me/your_telegram_channel" target="_blank" class="interactive-hover" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+            <p>&copy; 2024 Mariya Mistarenko. Всі права захищені. Створено за допомогою цифрової магії.</p>
+        </div>
+    </footer>
+    <div class="chat-icon interactive-hover" id="chatIcon"><i class="fas fa-comment-dots"></i></div>
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <span>Прямий звязок з Кодеркою</span>
+            <button class="close-btn" id="closeChatBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="active-users-display" id="activeUsersCount">Активних користувачів: 0</div>
+        <div id="usernamePrompt">
+            <h3 class="chat-section-title">Введіть ваш позивний</h3>
+            <p style="font-size: 0.9rem; color: var(--text-color);">Це ім'я буде відображатися в чаті.</p>
+            <input type="text" id="usernameInput" placeholder="Ваш позивний" required>
+            <button id="saveUsernameBtn" class="btn">Приєднатися до мережі</button>
+        </div>
+        <div class="chat-body" id="chatBody" style="display: none;"></div>
+        <div class="chat-input-area" style="display: none;">
+            <input type="text" id="chatInput" placeholder="Введіть повідомлення..." class="interactive-hover">
+            <button id="sendChatBtn" class="btn interactive-hover">Надіслати</button>
+        </div>
+    </div>
+    <div class="news-icon interactive-hover" id="newsIcon"><i class="fas fa-newspaper"></i></div>
+    <div class="news-window" id="newsWindow">
+        <div class="news-header">
+            <div class="news-header-title">
+                <span>Кібер-Новини</span>
+                <div id="newsCountdown">Оновлення...</div>
+            </div>
+            <button class="close-btn" id="closeNewsBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="news-body" id="newsBody">
+            <div class="news-loading" id="newsLoading">Завантаження новин...</div>
+        </div>
+    </div>
+
+    <script type="module">
+//
+// MI$TA'S CORE SCRIPT v2.0
+// ARCHITECT: PEPETHEFROG
+// AGENT: M. MISTARENKO
+// STATUS: REBUILT & ENHANCED
+//
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+// --- INITIALIZATION ---
+const SUPABASE_URL = 'https://ktragdmkrdhuhwohfczz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt0cmFnZG1rcmRodWh3b2hmY3p6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MzMzODEsImV4cCI6MjA2ODUwOTM4MX0.NKgEci1-5rJkOF6DTsAL3u9gVFC80va-Uy9z-UU09jk';
+const BACKEND_URL = 'https://mista-backend.onrender.com';
+
+let supabase;
+try {
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+    console.error("FATAL: Supabase client failed to initialize.", e);
+    // If Supabase fails, the site is crippled. We can show a message or just log it.
+}
+
+
+// --- DOM ELEMENTS ---
+const DOMElements = {
+    cursorDot: document.querySelector('.cursor-dot'),
+    cursorOutline: document.querySelector('.cursor-outline'),
+    matrixCanvas: document.getElementById('matrix-bg'),
+    // Removed glitchTitle: document.querySelector('.glitch-layers'),
+    // Chat
+    chatIcon: document.getElementById('chatIcon'),
+    chatWindow: document.getElementById('chatWindow'),
+    closeChatBtn: document.getElementById('closeChatBtn'),
+    chatBody: document.getElementById('chatBody'),
+    chatInput: document.getElementById('chatInput'),
+    sendChatBtn: document.getElementById('sendChatBtn'),
+    usernamePrompt: document.getElementById('usernamePrompt'),
+    usernameInput: document.getElementById('usernameInput'),
+    saveUsernameBtn: document.getElementById('saveUsernameBtn'),
+    activeUsersCount: document.getElementById('activeUsersCount'),
+    chatInputArea: document.querySelector('.chat-input-area'),
+    // News
+    newsIcon: document.getElementById('newsIcon'),
+    newsWindow: document.getElementById('newsWindow'),
+    closeNewsBtn: document.getElementById('closeNewsBtn'),
+    newsBody: document.getElementById('newsBody'),
+    newsLoading: document.getElementById('newsLoading'),
+    newsCountdown: document.getElementById('newsCountdown'),
+    // Brainstorm
+    brainstormInput: document.getElementById('brainstormInput'),
+    generateIdeaBtn: document.getElementById('generateIdeaBtn'),
+    brainstormOutput: document.getElementById('brainstormOutput'),
+};
+
+// --- STATE MANAGEMENT ---
+const AppState = {
+    username: localStorage.getItem('mista_chat_username'),
+    userId: localStorage.getItem('mista_chat_userid'),
+    supabaseChannel: null,
+    lastMessageTimestamp: new Date(0),
+    newsUpdateTimer: null,
+    runes: ['ᛗ', 'ᛁ', 'ᛊ', 'ᛏ', 'ᚨ', 'ᚱ', 'ᛖ', 'ᚾ', 'ᚲ', 'ᛟ', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚩ', 'ᚱ', 'ᚳ', 'ᚷ', 'ᚹ', 'ᚻ', 'ᚾ', 'ᛁ', 'ᛄ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛝ', 'ᛟ', 'ᛞ'],
+    typingAnimationInterval: null,
+};
+
+
+// --- MODULE: NEO CURSOR ---
+function initCursor() {
+    if (!DOMElements.cursorDot || !DOMElements.cursorOutline) return;
+    window.addEventListener('mousemove', (e) => {
+        const { clientX: posX, clientY: posY } = e;
+        DOMElements.cursorDot.style.left = `${posX}px`;
+        DOMElements.cursorDot.style.top = `${posY}px`;
+        DOMElements.cursorOutline.animate({
+            left: `${posX}px`,
+            top: `${posY}px`
+        }, { duration: 500, fill: 'forwards' });
+    });
+}
+
+// --- MODULE: MATRIX BACKGROUND ---
+function initMatrix() {
+    const canvas = DOMElements.matrixCanvas;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const letters = 'M1$TДR3ИK0'.split('');
+    const fontSize = 16;
+    const columns = canvas.width / fontSize;
+    const drops = Array.from({ length: columns }).fill(1);
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(1, 4, 9, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(57, 255, 20, 0.5)'; // Brighter green
+        ctx.font = `${fontSize}px monospace`;
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = letters[Math.floor(Math.random() * letters.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+    setInterval(drawMatrix, 45);
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+}
+
+// --- MODULE: RUNE HOVER EFFECT ---
+function initRuneHover() {
+    const titleElement = document.getElementById('rune-title');
+    if (!titleElement) return;
+
+    const originalText = titleElement.textContent;
+    titleElement.innerHTML = ''; // Clear the element
+
+    // Wrap each character in a span and store original char
+    originalText.split('').forEach(char => {
+        const charSpan = document.createElement('span');
+        charSpan.className = 'rune-char interactive-hover'; // Add interactive-hover class
+        charSpan.textContent = char;
+        charSpan.dataset.originalChar = char; // Store original character
+        titleElement.appendChild(charSpan);
+    });
+
+    titleElement.querySelectorAll('.rune-char').forEach(span => {
+        const originalChar = span.dataset.originalChar;
+        let timeoutId;
+
+        span.addEventListener('mouseenter', () => {
+            clearTimeout(timeoutId);
+            span.classList.add('rune');
+            span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+        });
+
+        span.addEventListener('mouseleave', () => {
+            timeoutId = setTimeout(() => {
+                span.classList.remove('rune');
+                span.textContent = originalChar;
+            }, 300); // Delay before reverting
+        });
+    });
+}
+
+
+// --- MODULE: CHAT ---
+function initChat() {
+    if (!supabase || !DOMElements.chatIcon) return;
+
+    const setupChatUI = () => {
+        DOMElements.usernamePrompt.style.display = 'none';
+        DOMElements.chatBody.style.display = 'flex';
+        DOMElements.chatInputArea.style.display = 'flex';
+        initializeSupabaseChannel();
+        loadInitialMessages();
+        listenForMessages();
+    };
+
+    if (AppState.username && AppState.userId) {
+        setupChatUI();
+    }
+
+    DOMElements.chatIcon.addEventListener('click', () => DOMElements.chatWindow.classList.toggle('active'));
+    DOMElements.closeChatBtn.addEventListener('click', () => DOMElements.chatWindow.classList.remove('active'));
+    DOMElements.sendChatBtn.addEventListener('click', sendMessage);
+    DOMElements.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
+
+    DOMElements.saveUsernameBtn.addEventListener('click', () => {
+        const username = DOMElements.usernameInput.value.trim();
+        if (username) {
+            AppState.username = username;
+            AppState.userId = 'user_' + Date.now() + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('mista_chat_username', AppState.username);
+            localStorage.setItem('mista_chat_userid', AppState.userId);
+            setupChatUI();
+        }
+    });
+}
+
+function displayChatMessage(username, message, isMe) {
+    if (!message || typeof message !== 'string') return;
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('chat-message', isMe ? 'self' : 'other');
+    msgDiv.innerHTML = `<span class="username">${username || 'Невідомий'}</span><p>${message.replace(/\n/g, '<br>')}</p>`;
+    DOMElements.chatBody.appendChild(msgDiv);
+    DOMElements.chatBody.scrollTop = DOMElements.chatBody.scrollHeight;
+}
+
+async function loadInitialMessages() {
+    try {
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .order('created_at', { ascending: true });
+        if (error) throw error;
+        data.forEach(msg => displayChatMessage(msg.username, msg.message, msg.user_id === AppState.userId));
+    } catch (error) {
+        console.error("Error loading initial messages:", error);
+        displayChatMessage('MI$TA', 'Не вдалося завантажити історію чату. Спробуй пізніше.', false);
+    }
+}
+
+function initializeSupabaseChannel() {
+    if (AppState.supabaseChannel) {
+        AppState.supabaseChannel.unsubscribe();
+    }
+    AppState.supabaseChannel = supabase.channel('chat_room', {
+        config: {
+            presence: {
+                key: AppState.userId
+            }
+        }
+    });
+
+    AppState.supabaseChannel
+        .on('presence', { event: 'sync' }, () => {
+            const presenceState = AppState.supabaseChannel.presenceState();
+            const uniqueUsers = new Set();
+            for (const channelName in presenceState) {
+                for (const user of presenceState[channelName]) {
+                    uniqueUsers.add(user.username);
+                }
+            }
+            DOMElements.activeUsersCount.textContent = `Активних користувачів: ${uniqueUsers.size}`;
+        })
+        .on('presence', { event: 'join' }, ({ newPresences }) => {
+            newPresences.forEach(p => {
+                displayChatMessage('MI$TA', `${p.username} приєднався до мережі.`, false);
+            });
+        })
+        .on('presence', { event: 'leave' }, ({ leftPresences }) => {
+            leftPresences.forEach(p => {
+                displayChatMessage('MI$TA', `${p.username} покинув мережу.`, false);
+            });
+        })
+        .subscribe(async (status) => {
+            if (status === 'SUBSCRIBED') {
+                const { error } = await AppState.supabaseChannel.track({ username: AppState.username, user_id: AppState.userId });
+                if (error) console.error("Error tracking presence:", error);
+            }
+        });
+}
+
+function listenForMessages() {
+    AppState.supabaseChannel
+        .on('broadcast', { event: 'chat_message' }, ({ payload }) => {
+            // Only display messages from others, as self messages are displayed immediately
+            if (payload.user_id !== AppState.userId) {
+                displayChatMessage(payload.username, payload.message, false);
+            }
+        })
+        .subscribe();
+}
+
+
+function startTypingAnimation() {
+    stopTypingAnimation(); // Clear any existing animation
+
+    const indicatorDiv = document.createElement('div');
+    indicatorDiv.id = 'mista-typing-indicator';
+    indicatorDiv.classList.add('chat-message', 'other');
+    indicatorDiv.innerHTML = `
+        <span class="username">MI$TA</span>
+        <div class="rune-symbols">
+            <span class="rune-char">.</span>
+            <span class="rune-char">.</span>
+            <span class="rune-char">.</span>
+        </div>
+    `;
+    DOMElements.chatBody.appendChild(indicatorDiv);
+    DOMElements.chatBody.scrollTop = DOMElements.chatBody.scrollHeight;
+
+    const runeChars = indicatorDiv.querySelectorAll('.rune-char');
+    AppState.typingAnimationInterval = setInterval(() => {
+        runeChars.forEach(char => {
+            char.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+        });
+    }, 100);
+}
+
+function stopTypingAnimation() {
+    clearInterval(AppState.typingAnimationInterval);
+    const indicator = document.getElementById('mista-typing-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+async function sendMessage() {
+    const messageText = DOMElements.chatInput.value.trim();
+    if (!messageText || !AppState.username) return;
+
+    displayChatMessage(AppState.username, messageText, true);
+    DOMElements.chatInput.value = '';
+    startTypingAnimation();
+
+    try {
+        const response = await fetch(`${BACKEND_URL}/chat`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: messageText, user_id: AppState.userId, username: AppState.username })
+        });
+        
+        stopTypingAnimation();
+
+        if (!response.ok) {
+            // Display a generic error from the backend if the request fails
+            const errorData = await response.json().catch(() => ({ detail: 'Невідома помилка сервера.' }));
+            displayChatMessage('MI$TA', `Помилка: ${errorData.detail || response.statusText}`, false);
+            return;
+        }
+        
+        const data = await response.json();
+        displayChatMessage('MI$TA', data.response, false);
+    } catch (err) {
+        console.error("Send message error:", err);
+        stopTypingAnimation();
+        displayChatMessage('MI$TA', 'Мережевий шторм. Не можу достукатися до свого мозку. Спробуй пізніше.', false);
+    }
+}
+
+
+// --- MODULE: NEWS ---
+function initNews() {
+    if (!DOMElements.newsIcon) return;
+    const NEWS_REFRESH_INTERVAL = 10 * 60 * 60 * 1000; // 10 hours
+
+    const updateNewsView = () => {
+        const cachedNews = localStorage.getItem('mista_news_cache');
+        const lastFetchTime = parseInt(localStorage.getItem('mista_news_last_fetch'), 10);
+        const now = Date.now();
+
+        if (cachedNews && lastFetchTime && (now - lastFetchTime < NEWS_REFRESH_INTERVAL)) {
+            DOMElements.newsLoading.style.display = 'none';
+            displayNews(JSON.parse(cachedNews));
+        } else {
+            fetchNews();
+        }
+        startNewsCountdown(NEWS_REFRESH_INTERVAL);
+    };
+
+    DOMElements.newsIcon.addEventListener('click', () => {
+        const isActive = DOMElements.newsWindow.classList.toggle('active');
+        if (isActive) updateNewsView();
+        else clearInterval(AppState.newsUpdateTimer);
+    });
+
+    DOMElements.closeNewsBtn.addEventListener('click', () => {
+        DOMElements.newsWindow.classList.remove('active');
+        clearInterval(AppState.newsUpdateTimer);
+    });
+}
+
+function displayNews(newsItems) {
+    DOMElements.newsBody.innerHTML = '';
+    if (!newsItems || newsItems.length === 0) {
+        DOMElements.newsBody.innerHTML = '<p class="news-loading">Сигнали відсутні. Інфопростір чистий.</p>';
+        return;
+    }
+    newsItems.forEach(news => {
+        const item = document.createElement('div');
+        item.className = 'news-item';
+        item.innerHTML = `
+            <h4>${news.title}</h4>
+            <p>${news.description}</p>
+            <a href="${news.link}" target="_blank" class="interactive-hover">Джерело <i class="fas fa-external-link-alt"></i></a>
+        `;
+        DOMElements.newsBody.appendChild(item);
+    });
+}
+
+function startNewsCountdown(interval) {
+    clearInterval(AppState.newsUpdateTimer);
+    AppState.newsUpdateTimer = setInterval(() => {
+        const lastFetchTime = parseInt(localStorage.getItem('mista_news_last_fetch'), 10);
+        if (!lastFetchTime) {
+            DOMElements.newsCountdown.textContent = 'Оновлення...';
+            return;
+        }
+        const timeRemaining = (lastFetchTime + interval) - Date.now();
+        if (timeRemaining <= 0) {
+            DOMElements.newsCountdown.textContent = 'Готово до оновлення';
+            clearInterval(AppState.newsUpdateTimer);
+            return;
+        }
+        const h = Math.floor(timeRemaining / 3600000);
+        const m = Math.floor((timeRemaining % 3600000) / 60000);
+        const s = Math.floor((timeRemaining % 60000) / 1000);
+        DOMElements.newsCountdown.textContent = `Оновлення через: ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }, 1000);
+}
+
+async function fetchNews() {
+    DOMElements.newsLoading.style.display = 'block';
+    DOMElements.newsBody.innerHTML = '';
+    try {
+        const response = await fetch(`${BACKEND_URL}/news`, { method: 'POST' });
+        if (!response.ok) throw new Error(`Network error: ${response.statusText}`);
+        const newsItems = await response.json();
+        DOMElements.newsLoading.style.display = 'none';
+        displayNews(newsItems);
+        localStorage.setItem('mista_news_cache', JSON.stringify(newsItems));
+        localStorage.setItem('mista_news_last_fetch', Date.now().toString());
+    } catch (error) {
+        console.error("Failed to fetch news:", error);
+        DOMElements.newsLoading.style.display = 'none';
+        DOMElements.newsBody.innerHTML = '<p class="news-loading">Помилка каналу новин.</p>';
+    }
+}
+
+// --- MODULE: BRAINSTORM ---
+function initBrainstorm() {
+    if (!DOMElements.generateIdeaBtn) return;
+
+    DOMElements.generateIdeaBtn.addEventListener('click', async () => {
+        const prompt = DOMElements.brainstormInput.value.trim();
+        if (!prompt) {
+            DOMElements.brainstormOutput.textContent = "Порожнеча не надихає. Введіть концепцію.";
+            return;
+        }
+        DOMElements.brainstormOutput.textContent = "Підключаюся до ноосфери...";
+        DOMElements.brainstormOutput.classList.add('loading');
+        DOMElements.generateIdeaBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${BACKEND_URL}/brainstorm`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt })
+            });
+            if (!response.ok) throw new Error(`Server error: ${response.statusText}`);
+            const data = await response.json();
+            DOMElements.brainstormOutput.textContent = data.response;
+        } catch (error) {
+            console.error("Brainstorm error:", error);
+            DOMElements.brainstormOutput.textContent = "Помилка генерації. Схоже, ідеї сьогодні страйкують.";
+        } finally {
+            DOMElements.brainstormOutput.classList.remove('loading');
+            DOMElements.generateIdeaBtn.disabled = false;
+        }
+    });
+}
+
+
+// --- APP INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("M.I.S.T.A. consciousness initializing...");
+    initCursor();
+    initMatrix();
+    initRuneHover();
+    initChat();
+    initNews();
+    initBrainstorm();
+    console.log("System online. Welcome, Architect.");
+});
+    </script>
+</body>
+</html>

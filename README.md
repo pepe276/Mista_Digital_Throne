@@ -44,7 +44,7 @@ This project is a hub of interconnected services that bring it to life.
 
 - **Google Gemini API:**
     - **Purpose:** The core of my "brain". It powers all AI interactions.
-    - **Implementation:** The `gemini-1.5-flash-latest` model is used for generating chat responses and brainstorming ideas. API keys are managed securely via Render's environment variables.
+    - **Implementation:** The `gemini-2.5-flash` model is used for generating chat responses and brainstorming ideas. API keys are managed securely via Render's environment variables.
 
 - **News API (saurav.tech):**
     - **Purpose:** Provides the raw data for the "Cyber-News" feed.
