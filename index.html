@@ -252,7 +252,87 @@
             .hero-image-container { margin-top: 50px; grid-row: 1; }
             .hero-subtitle { margin: 0 auto 20px; }
         }
-        @media (max-width: 768px) { .nav-links { display: none; } .section-title { font-size: 2.2rem; } }
+        @media (max-width: 768px) { 
+            .nav-links { display: none; } 
+            .section-title { font-size: 2.2rem; } 
+
+            /* Hamburger Menu */
+            .hamburger-menu {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                width: 30px;
+                height: 25px;
+                cursor: pointer;
+                z-index: 1001;
+            }
+            .hamburger-menu .bar {
+                width: 100%;
+                height: 3px;
+                background-color: var(--neon-cyan);
+                transition: all 0.3s ease-in-out;
+                border-radius: 2px;
+            }
+            .hamburger-menu.active .bar:nth-child(1) { transform: translateY(11px) rotate(45deg); }
+            .hamburger-menu.active .bar:nth-child(2) { opacity: 0; }
+            .hamburger-menu.active .bar:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
+
+            /* Mobile Menu */
+            .mobile-menu {
+                display: flex;
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: -100%; /* Hidden by default */
+                width: 70%;
+                height: 100%;
+                background: rgba(1, 4, 9, 0.95);
+                backdrop-filter: blur(15px);
+                padding-top: 100px;
+                box-shadow: 5px 0 30px rgba(0, 229, 255, 0.3);
+                transition: left 0.3s ease-in-out;
+                z-index: 999;
+                border-right: 1px solid var(--neon-cyan);
+            }
+            .mobile-menu.active { left: 0; }
+            .mobile-menu a {
+                color: var(--text-color);
+                text-decoration: none;
+                font-weight: 700;
+                padding: 15px 20px;
+                border-bottom: 1px solid rgba(66, 133, 244, 0.1);
+                transition: all 0.3s;
+            }
+            .mobile-menu a:hover {
+                color: var(--neon-cyan);
+                background: rgba(0, 229, 255, 0.1);
+                text-shadow: 0 0 5px var(--neon-cyan);
+            }
+            .mobile-menu a:last-child { border-bottom: none; }
+
+            /* Chat and News Icons/Windows */
+            .chat-icon, .news-icon {
+                bottom: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 1.8rem;
+            }
+            .chat-icon { right: 20px; }
+            .news-icon { left: 20px; }
+
+            .chat-window, .news-window {
+                bottom: 80px;
+                width: 90vw;
+                height: 70vh;
+                right: 5vw; /* Center horizontally */
+                left: 5vw; /* Center horizontally */
+                transform: scale(1); /* Always full scale on mobile */
+                opacity: 1; /* Always visible when active on mobile */
+            }
+            .chat-window.active, .news-window.active {
+                display: flex;
+            }
+        }
         .chat-icon {
             position: fixed;
             bottom: 30px;
@@ -568,16 +648,28 @@
         <div class="container">
             <nav>
                 <div class="logo interactive-hover">MI$TA</div>
-                <div class="nav-links">
+                <div class="nav-links" id="main-nav-links">
                     <a href="#about" class="interactive-hover">Сигнал</a>
                     <a href="#skills" class="interactive-hover">Протоколи</a>
                     <a href="#projects" class="interactive-hover">Артефакти</a>
                     <a href="#contact" class="interactive-hover">Зв'язок</a>
                     <a href="#skills" class="interactive-hover">Мозковий Штурм</a> 
                 </div>
+                <div class="hamburger-menu interactive-hover" id="hamburgerMenu">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
             </nav>
         </div>
     </header>
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#about" class="interactive-hover">Сигнал</a>
+        <a href="#skills" class="interactive-hover">Протоколи</a>
+        <a href="#projects" class="interactive-hover">Артефакти</a>
+        <a href="#contact" class="interactive-hover">Зв'язок</a>
+        <a href="#skills" class="interactive-hover">Мозковий Штурм</a>
+    </div>
     <main>
         <section class="hero" id="home">
             <div class="container hero-content">
@@ -715,6 +807,10 @@ const DOMElements = {
     cursorOutline: document.querySelector('.cursor-outline'),
     matrixCanvas: document.getElementById('matrix-bg'),
     // Removed glitchTitle: document.querySelector('.glitch-layers'),
+    // Mobile Menu
+    hamburgerMenu: document.getElementById('hamburgerMenu'),
+    mobileMenu: document.getElementById('mobileMenu'),
+    mainNavLinks: document.getElementById('main-nav-links'),
     // Chat
     chatIcon: document.getElementById('chatIcon'),
     chatWindow: document.getElementById('chatWindow'),
@@ -834,6 +930,24 @@ function initRuneHover() {
                 span.classList.remove('rune');
                 span.textContent = originalChar;
             }, 300); // Delay before reverting
+        });
+    });
+}
+
+
+function initMobileMenu() {
+    if (!DOMElements.hamburgerMenu || !DOMElements.mobileMenu || !DOMElements.mainNavLinks) return;
+
+    DOMElements.hamburgerMenu.addEventListener('click', () => {
+        DOMElements.hamburgerMenu.classList.toggle('active');
+        DOMElements.mobileMenu.classList.toggle('active');
+    });
+
+    // Close mobile menu when a link is clicked
+    DOMElements.mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            DOMElements.hamburgerMenu.classList.remove('active');
+            DOMElements.mobileMenu.classList.remove('active');
         });
     });
 }
@@ -1165,6 +1279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCursor();
     initMatrix();
     initRuneHover();
+    initMobileMenu();
     initChat();
     initNews();
     initBrainstorm();
