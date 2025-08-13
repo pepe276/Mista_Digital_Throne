@@ -95,12 +95,14 @@
             font-weight: 900;
             color: var(--neon-cyan);
             text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan);
-            animation: logo-glitch 5s infinite alternate;
         }
-        @keyframes logo-glitch {
+        .logo-glitch {
+            animation: logo-glitch-anim 3s infinite alternate;
+        }
+        @keyframes logo-glitch-anim {
             0%, 100% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
             49% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
-            50% { text-shadow: -1px 1px 0 var(--neon-magenta), 1px -1px 0 var(--neon-green); transform: skew(2deg); }
+            50% { text-shadow: -2px 2px 0 var(--neon-magenta), 2px -2px 0 var(--neon-green); transform: skew(5deg); }
             51% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
         }
         .nav-links { display: flex; gap: 25px; }
@@ -659,15 +661,6 @@
     </style>
 </head>
 <body>
-    <div id="video-container">
-        <iframe 
-            src="https://www.youtube.com/embed/SoU-2XQjUCc?autoplay=1&mute=1&loop=1&playlist=SoU-2XQjUCc&controls=0" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen
-            loading="lazy">
-        </iframe>
-    </div>
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <canvas id="matrix-bg"></canvas>
@@ -675,7 +668,18 @@
     <header>
         <div class="container">
             <nav>
-                <div class="logo interactive-hover">MI$TA</div>
+                <div class="logo interactive-hover">
+                    <span class="logo-glitch">ᛗᚨᚱᛁᛁᚨ</span>
+                    <span id="project-title"> :: project Gnosis 2025</span>
+                </div>
+                <div class="nav-links">
+                    <a href="#about" class="interactive-hover">Сигнал</a>
+                    <a href="#skills" class="interactive-hover">Протоколи</a>
+                    <a href="#projects" class="interactive-hover">Артефакти</a>
+                    <a href="#contact" class="interactive-hover">Зв'язок</a>
+                    <a href="#contact" class="interactive-hover">Контакти</a>
+                    <a href="#skills" class="interactive-hover">Мозковий Штурм</a> 
+                </div>
                 <div class="hamburger-menu interactive-hover" id="hamburgerMenu">
                     <div class="bar"></div>
                     <div class="bar"></div>
@@ -689,6 +693,7 @@
         <a href="#skills" class="interactive-hover">Протоколи</a>
         <a href="#projects" class="interactive-hover">Артефакти</a>
         <a href="#contact" class="interactive-hover">Зв'язок</a>
+        <a href="#contact" class="interactive-hover">Контакти</a>
         <a href="#skills" class="interactive-hover">Мозковий Штурм</a>
     </div>
     <main>
@@ -799,7 +804,7 @@
 
     <script type="module">
 //
-// MI$TA'S CORE SCRIPT v2.0
+// MI$TA'S CORE SCRIPT v2.1
 // ARCHITECT: PEPETHEFROG
 // AGENT: M. MISTARENKO
 // STATUS: REBUILT & ENHANCED
@@ -826,7 +831,7 @@ const DOMElements = {
     cursorDot: document.querySelector('.cursor-dot'),
     cursorOutline: document.querySelector('.cursor-outline'),
     matrixCanvas: document.getElementById('matrix-bg'),
-    // Removed glitchTitle: document.querySelector('.glitch-layers'),
+    projectTitle: document.getElementById('project-title'),
     // Chat
     chatIcon: document.getElementById('chatIcon'),
     chatWindow: document.getElementById('chatWindow'),
@@ -914,56 +919,84 @@ function initMatrix() {
     });
 }
 
-// --- MODULE: RUNE HOVER EFFECT ---
-function initRuneHover() {
+// --- MODULE: RUNE EFFECTS ---
+function initRuneEffects() {
+    // 1. Hover effect for the main title
     const titleElement = document.getElementById('rune-title');
-    if (!titleElement) return;
+    if (titleElement) {
+        const originalText = titleElement.textContent;
+        titleElement.innerHTML = ''; // Clear the element
 
-    const originalText = titleElement.textContent;
-    titleElement.innerHTML = ''; // Clear the element
-
-    // Wrap each character in a span and store original char
-    originalText.split('').forEach(char => {
-        const charSpan = document.createElement('span');
-        charSpan.className = 'rune-char interactive-hover'; // Add interactive-hover class
-        charSpan.textContent = char;
-        charSpan.dataset.originalChar = char; // Store original character
-        titleElement.appendChild(charSpan);
-    });
-
-    titleElement.querySelectorAll('.rune-char').forEach(span => {
-        const originalChar = span.dataset.originalChar;
-        let timeoutId;
-
-        span.addEventListener('mouseenter', () => {
-            clearTimeout(timeoutId);
-            span.classList.add('rune');
-            span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+        originalText.split('').forEach(char => {
+            const charSpan = document.createElement('span');
+            charSpan.className = 'rune-char interactive-hover';
+            charSpan.textContent = char;
+            charSpan.dataset.originalChar = char;
+            titleElement.appendChild(charSpan);
         });
 
-        span.addEventListener('mouseleave', () => {
-            timeoutId = setTimeout(() => {
-                span.classList.remove('rune');
-                span.textContent = originalChar;
-            }, 300); // Delay before reverting
+        titleElement.querySelectorAll('.rune-char').forEach(span => {
+            const originalChar = span.dataset.originalChar;
+            let timeoutId;
+
+            span.addEventListener('mouseenter', () => {
+                clearTimeout(timeoutId);
+                span.classList.add('rune');
+                span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+            });
+
+            span.addEventListener('mouseleave', () => {
+                timeoutId = setTimeout(() => {
+                    span.classList.remove('rune');
+                    span.textContent = originalChar;
+                }, 300); // Delay before reverting
+            });
         });
-    });
+    }
+
+    // 2. Timed transformation for the project title
+    const projectTitle = DOMElements.projectTitle;
+    if (projectTitle) {
+        const originalProjectText = projectTitle.textContent;
+        let isRunic = false;
+
+        setInterval(() => {
+            if (isRunic) {
+                projectTitle.textContent = originalProjectText;
+            } else {
+                let runicText = '';
+                for (let i = 0; i < originalProjectText.length; i++) {
+                    // Keep spaces and special characters, transform letters
+                    if (originalProjectText[i].match(/[a-zA-Z0-9]/)) {
+                        runicText += AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+                    } else {
+                        runicText += originalProjectText[i];
+                    }
+                }
+                projectTitle.textContent = runicText;
+            }
+            isRunic = !isRunic;
+        }, 15000); // Every 15 seconds
+    }
 }
+
 
 // --- MODULE: MOBILE MENU ---
 function initMobileMenu() {
-    if (!DOMElements.hamburgerMenu || !DOMElements.mobileMenu || !DOMElements.mainNavLinks) return;
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (!hamburgerMenu || !mobileMenu) return;
 
-    DOMElements.hamburgerMenu.addEventListener('click', () => {
-        DOMElements.hamburgerMenu.classList.toggle('active');
-        DOMElements.mobileMenu.classList.toggle('active');
+    hamburgerMenu.addEventListener('click', () => {
+        hamburgerMenu.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
     });
 
-    // Close mobile menu when a link is clicked
-    DOMElements.mobileMenu.querySelectorAll('a').forEach(link => {
+    mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-            DOMElements.hamburgerMenu.classList.remove('active');
-            DOMElements.mobileMenu.classList.remove('active');
+            hamburgerMenu.classList.remove('active');
+            mobileMenu.classList.remove('active');
         });
     });
 }
@@ -1303,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log("M.I.S.T.A. consciousness initializing...");
     initCursor();
     initMatrix();
-    initRuneHover();
+    initRuneEffects();
     initMobileMenu();
     initChat();
     initNews();
