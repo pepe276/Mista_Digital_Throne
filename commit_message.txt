@@ -1,0 +1,4 @@
+feat: Implement Supabase Realtime broadcasting for chat messages
+
+- Modified `chat_backend.py` to broadcast chat messages to the `chat_room` channel after saving them to the database.
+- Updated `index.html` to listen for these broadcast messages on the `chat_room` channel, resolving the `supabase.from(...).on is not a function` error and enabling real-time chat functionality.
