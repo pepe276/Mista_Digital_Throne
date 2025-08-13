@@ -16,3 +16,21 @@ __pycache__/
 *.pyd
 venv/
 env/
+
+# Додаткові ігнорування для логів, тимчасових файлів та зображень
+*.log
+*.txt
+*.html.tmp
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.sublime-workspace
+*.vscode/
+*.idea/
+mista_images/
+16941.png
+googlefaf41e4f900b147d.html
+mista.txt
+temp_index.html
