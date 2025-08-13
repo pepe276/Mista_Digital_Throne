@@ -331,7 +331,7 @@ class Analyzer:
         # New: If "бот" is present but not a direct attack, add 'technical_discussion_bot_as_tool' context
         if "бот" in processed_input and not self.is_direct_bot_attack(processed_input):
             if "створити" in processed_input or "працюєш" in processed_input or "тестую" in processed_input or "програма" in processed_input or "кодуєш" in processed_input or "розробка" in processed_input:
-                contexts.append("technology_and_coding") # Замість technical_discussion_bot_as_tool, використовуємо існуючий
+                contexts.append("technology_and_coding") # Замість technical_discussion_bot_as_ємо існуючий
                 contexts.append("technical_inquiry") # Додаємо, як специфічний під-контекст
 
         # --- Покращена логіка для визначення контексту лору ---
@@ -397,6 +397,11 @@ class Analyzer:
             contexts.append("akashic_inquiry_context")
         if any(kw in processed_input for kw in self.keyword_lists["moonshi_space_reference"]):
             contexts.append("moonshi_space_context")
+        # НОВІ КОНТЕКСТИ ДЛЯ ГНОСТИЦИЗМУ
+        if any(kw in processed_input for kw in self.keyword_lists["gnostic_inquiry"]):
+            contexts.append("gnostic_inquiry_context")
+        if any(kw in processed_input for kw in self.keyword_lists["spiritual_rejection"]):
+            contexts.append("spiritual_rejection_context")
 
 
         # Забезпечуємо унікальність та порядок (важливість)

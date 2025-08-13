@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MI$TARENKO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --background-color: #0a0a0a;
+            --text-color: #e0e0e0;
+            --primary-color: #9a4ff8;
+            --rune-color: #d4a72c;
+            --cursor-dot-color: #ffffff;
+            --cursor-outline-color: rgba(154, 79, 248, 0.5);
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            cursor: none;
+        }
+
+        .cursor-dot,
+        .cursor-outline {
+            pointer-events: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 999999;
+            /* Set to a very high value */
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.1s linear;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--cursor-dot-color);
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--cursor-outline-color);
+            transition: opacity 0.3s ease-in-out, transform 0.2s ease-out, width 0.3s ease-in-out, height 0.3s ease-in-out;
+        }
+
+        .cursor-outline.hover {
+            width: 30px;
+            height: 30px;
+            border-width: 3px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 10vw;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-color);
+            letter-spacing: 0.5vw;
+            user-select: none;
+        }
+
+        .title .rune-char {
+            display: inline-block;
+            transition: color 0.3s, transform 0.3s;
+            color: var(--text-color);
+        }
+
+        .title .rune-char.rune {
+            color: var(--rune-color);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Chat Styles */
+        #chat-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            max-width: 90%;
+            background-color: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            height: 200px;
+            display: flex;
+            flex-direction: column-reverse;
+            /* New messages appear at the bottom */
+        }
+
+        .message-wrapper {
+            max-width: 80%;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            font-size: 14px;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            background-color: #333;
+            color: var(--text-color);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        #chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 14px;
+            padding: 10px;
+        }
+
+        #chat-input:focus {
+            outline: none;
+        }
+
+        #send-button {
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        #send-button:hover {
+            background-color: #7a3fb1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <div class="container">
+        <h1 class="title" id="rune-title">MI$TARENKO</h1>
+    </div>
+
+    <div id="chat-container">
+        <div id="chat-messages">
+            <!-- Messages will be appended here -->
+        </div>
+        <div id="chat-input-container">
+            <input type="text" id="chat-input" placeholder="Çàïèòàéòå ùîñü...">
+            <button id="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Custom Cursor Logic ---
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorOutline = document.querySelector('.cursor-outline');
+
+            window.addEventListener('mousemove', (e) => {
+                const posX = e.clientX;
+                const posY = e.clientY;
+
+                cursorDot.style.opacity = '1';
+                cursorOutline.style.opacity = '1';
+
+                cursorDot.style.left = `${posX}px`;
+                cursorDot.style.top = `${posY}px`;
+
+                cursorOutline.style.transform = `translate(${posX - 20}px, ${posY - 20}px)`;
+            });
+            
+            document.body.addEventListener('mouseleave', () => {
+                cursorDot.style.opacity = '0';
+                cursorOutline.style.opacity = '0';
+            });
+
+            document.querySelectorAll('a, button, input[type="submit"], input[type="button"], .title .rune-char').forEach(el => {
+                el.addEventListener('mouseenter', () => cursorOutline.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursorOutline.classList.remove('hover'));
+            });
+
+            // --- Rune Hover Effect Logic ---
+            function initRuneHover(elementId) {
+                const titleElement = document.getElementById(elementId);
+                if (!titleElement) return;
+
+                const originalText = titleElement.textContent;
+                titleElement.innerHTML = ''; // Clear the element
+
+                // Wrap each character in a span
+                originalText.split('').forEach(char => {
+                    const charSpan = document.createElement('span');
+                    charSpan.className = 'rune-char';
+                    charSpan.textContent = char;
+                    titleElement.appendChild(charSpan);
+                });
+
+                const runes = ['?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?', '?'];
+                
+                titleElement.querySelectorAll('.rune-char').forEach(span => {
+                    const originalChar = span.textContent;
+                    let timeoutId;
+
+                    span.addEventListener('mouseenter', () => {
+                        clearTimeout(timeoutId);
+                        span.classList.add('rune');
+                        span.textContent = runes[Math.floor(Math.random() * runes.length)];
+                    });
+
+                    span.addEventListener('mouseleave', () => {
+                       timeoutId = setTimeout(() => {
+                           span.classList.remove('rune');
+                           span.textContent = originalChar;
+                       }, 300);
+                    });
+                });
+            }
+
+            initRuneHover('rune-title');
+
