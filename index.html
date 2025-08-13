@@ -22,12 +22,8 @@
             --glitch-text-shadow: 
                 -1px -1px 0px var(--neon-magenta), 
                 1px 1px 0px var(--neon-cyan);
-            /* New rune colors */
-            --rune-neon-cyan: #00e5ff;
-            --rune-neon-green: #39ff14;
-            --rune-neon-magenta: #ff00ff;
-            --pale-rose: rgba(255, 192, 203, 0.8); /* Pale pink with some transparency */
-            --dull-blue: rgba(135, 206, 235, 0.6); /* Sky blue with more transparency */
+            --pale-rose: rgba(255, 192, 203, 0.8);
+            --dull-blue: rgba(135, 206, 235, 0.6);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
@@ -45,7 +41,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            z-index: 999999; /* Set to a very high value */ /* Set to a very high value */
+            z-index: 999999;
             opacity: 0;
             transition: opacity 0.3s ease-in-out, transform 0.1s linear;
         }
@@ -91,13 +87,35 @@
         nav { display: flex; justify-content: space-between; align-items: center; }
         .logo {
             font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 900;
             color: var(--neon-cyan);
             text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan);
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
         }
         .logo-glitch {
             animation: logo-glitch-anim 3s infinite alternate;
+            display: inline-block;
+        }
+        #project-title {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: var(--text-color);
+            text-shadow: none;
+            margin-left: 15px;
+            display: inline-block;
+        }
+        #project-title .char {
+            display: inline-block;
+            transition: all 0.2s ease-out;
+        }
+        #project-title .char.glitching {
+            transform: scale(1.2) skew(-5deg, 5deg);
+            text-shadow: 0 0 5px var(--neon-magenta);
+            color: var(--neon-magenta);
         }
         @keyframes logo-glitch-anim {
             0%, 100% { text-shadow: 0 0 5px var(--neon-cyan), 0 0 15px var(--neon-cyan); transform: skew(0); }
@@ -123,8 +141,6 @@
         .nav-links a:hover::before { transform: scaleX(1); transform-origin: left; }
         .hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; }
         .hero-content { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; }
-        
-        /* New .title styles for rune effect */
         .title {
             font-family: 'Orbitron', sans-serif;
             font-size: clamp(2.0rem, 5.0vw, 4.0rem);
@@ -134,31 +150,21 @@
             color: var(--neon-green);
             margin-bottom: 20px;
             text-align: left;
-            letter-spacing: 0.1vw; /* Reduced letter spacing */
+            letter-spacing: 0.1vw;
             user-select: none;
-            /* Neon glow for the base text (cyan and green) */
-            text-shadow: 
-                0 0 5px var(--neon-green),
-                0 0 10px var(--neon-green),
-                0 0 20px var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green), 0 0 20px var(--neon-green);
         }
-
         .title .rune-char {
             display: inline-block;
-            transition: color 0.3s ease-out, transform 0.3s ease-out, text-shadow 0.3s ease-out; /* Smoother transition */
-            color: inherit; /* Inherit base color */
-            text-shadow: inherit; /* Inherit base shadow */
+            transition: color 0.3s ease-out, transform 0.3s ease-out, text-shadow 0.3s ease-out;
+            color: inherit;
+            text-shadow: inherit;
         }
-
         .title .rune-char.rune {
-            color: rgba(255, 0, 255, 0.35); /* Pink neon for runes */
-            transform: scale(1.05) rotate(2deg); /* Reduced scale and rotation for smoother effect */
-            text-shadow: 
-                0 0 8px rgba(255, 0, 255, 0.35),
-                0 0 15px rgba(255, 0, 255, 0.35),
-                0 0 25px rgba(255, 0, 255, 0.35); /* Stronger pink neon glow */
+            color: rgba(255, 0, 255, 0.35);
+            transform: scale(1.05) rotate(2deg);
+            text-shadow: 0 0 8px rgba(255, 0, 255, 0.35), 0 0 15px rgba(255, 0, 255, 0.35), 0 0 25px rgba(255, 0, 255, 0.35);
         }
-
         .hero-subtitle {
             font-size: 1.5rem;
             color: var(--pale-rose);
@@ -167,7 +173,7 @@
             overflow: hidden;
             border-right: 3px solid var(--pale-rose);
             animation: typing 3s steps(30, end), blink-caret .75s step-end infinite;
-            text-shadow: 0 0 5px var(--pale-rose), 0 0 10px var(--pale-rose); /* Added text-shadow */
+            text-shadow: 0 0 5px var(--pale-rose), 0 0 10px var(--pale-rose);
         }
         @keyframes typing { from { width: 0 } to { width: 100% } }
         @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--neon-green); } }
@@ -257,8 +263,6 @@
         @media (max-width: 768px) { 
             .nav-links { display: none; } 
             .section-title { font-size: 2.2rem; } 
-
-            /* Hamburger Menu */
             .hamburger-menu {
                 display: flex;
                 flex-direction: column;
@@ -278,14 +282,12 @@
             .hamburger-menu.active .bar:nth-child(1) { transform: translateY(11px) rotate(45deg); }
             .hamburger-menu.active .bar:nth-child(2) { opacity: 0; }
             .hamburger-menu.active .bar:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
-
-            /* Mobile Menu */
             .mobile-menu {
                 display: flex;
                 flex-direction: column;
                 position: fixed;
                 top: 0;
-                left: -100%; /* Hidden by default */
+                left: -100%;
                 width: 70%;
                 height: 100%;
                 background: rgba(1, 4, 9, 0.95);
@@ -311,8 +313,6 @@
                 text-shadow: 0 0 5px var(--neon-cyan);
             }
             .mobile-menu a:last-child { border-bottom: none; }
-
-            /* Chat and News Icons/Windows */
             .chat-icon, .news-icon {
                 bottom: 20px;
                 width: 50px;
@@ -321,19 +321,16 @@
             }
             .chat-icon { right: 20px; }
             .news-icon { left: 20px; }
-
             .chat-window, .news-window {
                 bottom: 80px;
                 width: 90vw;
                 height: 70vh;
-                right: 5vw; /* Center horizontally */
-                left: 5vw; /* Center horizontally */
-                transform: scale(1); /* Always full scale on mobile */
-                opacity: 1; /* Always visible when active on mobile */
+                right: 5vw;
+                left: 5vw;
+                transform: scale(1);
+                opacity: 1;
             }
-            .chat-window.active, .news-window.active {
-                display: flex;
-            }
+            .chat-window.active, .news-window.active { display: flex; }
         }
         .chat-icon {
             position: fixed;
@@ -391,10 +388,7 @@
             color: var(--neon-cyan);
             text-shadow: 0 0 5px var(--neon-cyan);
         }
-        .chat-window.expanded {
-            width: 60vw;
-            height: 70vh;
-        }
+        .chat-window.expanded { width: 60vw; height: 70vh; }
         .chat-header-btn {
             background: none;
             border: none;
@@ -403,13 +397,8 @@
             cursor: pointer;
             margin-left: 10px;
         }
-        .chat-header-btn:hover {
-            color: var(--neon-green);
-        }
-        .chat-header div {
-            display: flex;
-            align-items: center;
-        }
+        .chat-header-btn:hover { color: var(--neon-green); }
+        .chat-header div { display: flex; align-items: center; }
         .chat-header .close-btn { background: none; border: none; color: var(--neon-magenta); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
         .chat-header .close-btn:hover { color: var(--neon-green); }
         .chat-body { padding: 15px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; word-wrap: break-word; }
@@ -417,10 +406,10 @@
         .chat-message.self { background: rgba(0, 229, 255, 0.15); align-self: flex-end; text-align: right; border-color: var(--neon-cyan); }
         .chat-message.other { background: rgba(255, 0, 255, 0.15); align-self: flex-start; text-align: left; border-color: var(--neon-magenta); }
         .typing-indicator {
-            background: transparent; /* Видаляємо фон */
-            border: none; /* Видаляємо рамку */
-            box-shadow: none; /* Видаляємо тінь */
-            padding: 0; /* Видаляємо відступи */
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
             align-self: flex-start;
             text-align: left;
             font-size: 0.9rem;
@@ -428,49 +417,20 @@
             align-items: center;
             gap: 5px;
         }
-        .typing-indicator svg {
-            width: 40px;
-            height: 40px;
-            overflow: visible; /* Allow glow to bleed out */
-        }
-        .pen-icon {
-            filter: url(#neon-glow);
-            animation: write-anim 1.5s infinite alternate ease-in-out;
-        }
+        .typing-indicator svg { width: 40px; height: 40px; overflow: visible; }
+        .pen-icon { filter: url(#neon-glow); animation: write-anim 1.5s infinite alternate ease-in-out; }
         @keyframes write-anim {
-            0% {
-                transform: rotate(-10deg) translateX(0px);
-                filter: url(#neon-glow) brightness(1.2);
-            }
-            100% {
-                transform: rotate(5deg) translateX(2px);
-                filter: url(#neon-glow) brightness(2.0);
-            }
+            0% { transform: rotate(-10deg) translateX(0px); filter: url(#neon-glow) brightness(1.2); }
+            100% { transform: rotate(5deg) translateX(2px); filter: url(#neon-glow) brightness(2.0); }
         }
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .pen-icon {
-            width: 40px;
-            height: 40px;
-            animation: pen-pulse 1.5s infinite ease-in-out;
-        }
+        .typing-indicator { display: flex; align-items: center; gap: 10px; }
+        .pen-icon { width: 40px; height: 40px; animation: pen-pulse 1.5s infinite ease-in-out; }
         @keyframes pen-pulse {
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px var(--neon-cyan)); }
             50% { transform: scale(1.1); filter: drop-shadow(0 0 12px var(--neon-cyan)); }
         }
-        .rune-symbols {
-            font-size: 1.5rem;
-            color: var(--neon-green);
-            text-shadow: 0 0 8px var(--neon-green);
-        }
-        .rune-char {
-            display: inline-block;
-            animation: rune-fade 3s infinite linear;
-            opacity: 0;
-        }
+        .rune-symbols { font-size: 1.5rem; color: var(--neon-green); text-shadow: 0 0 8px var(--neon-green); }
+        .rune-char { display: inline-block; animation: rune-fade 3s infinite linear; opacity: 0; }
         .rune-char:nth-child(1) { animation-delay: 0s; }
         .rune-char:nth-child(2) { animation-delay: 1s; }
         .rune-char:nth-child(3) { animation-delay: 2s; }
@@ -630,10 +590,7 @@
         }
         .news-header .close-btn { background: none; border: none; color: var(--neon-magenta); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
         .news-header .close-btn:hover { color: var(--neon-cyan); }
-        .news-body { padding: 15px; flex-grow: 1; overflow-y: auto; display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .news-body { padding: 15px; flex-grow: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .news-item { background: rgba(13, 17, 23, 0.7); padding: 12px; border-radius: 8px; border: 1px solid rgba(57, 255, 20, 0.2); transition: background 0.2s, border-color 0.2s; }
         .news-item:hover { background: rgba(13, 17, 23, 0.9); border-color: var(--neon-green); box-shadow: 0 0 10px rgba(57, 255, 20, 0.3); }
         .news-item h4 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--neon-cyan); margin-bottom: 5px; text-shadow: 0 0 3px var(--neon-cyan); }
@@ -641,26 +598,31 @@
         .news-item a { color: var(--neon-magenta); text-decoration: none; font-size: 0.8rem; font-weight: 700; transition: color 0.2s; }
         .news-item a:hover { color: var(--neon-cyan); text-decoration: underline; }
         .news-loading { text-align: center; color: var(--neon-green); font-style: italic; padding: 20px; }
-        
         #video-container {
             position: fixed;
-            top: 80px; /* Below the header */
-            left: 20px;
-            width: 280px; /* Small size */
-            height: 157px; /* 16:9 aspect ratio */
-            z-index: 999; /* Below header, above most content */
+            top: 100px;
+            left: 30px;
+            width: 280px;
+            height: 157px;
+            z-index: 999;
             border: 1px solid var(--neon-cyan);
             box-shadow: 0 0 15px var(--neon-cyan);
             background: #000;
             transition: opacity 0.5s;
         }
-        #video-container iframe {
-            width: 100%;
-            height: 100%;
-        }
+        #video-container iframe { width: 100%; height: 100%; }
     </style>
 </head>
 <body>
+    <div id="video-container">
+        <iframe 
+            src="https://www.youtube.com/embed/SoU-2XQjUCc?autoplay=1&mute=1&loop=1&playlist=SoU-2XQjUCc&controls=0" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen
+            loading="lazy">
+        </iframe>
+    </div>
     <div class="cursor-dot"></div>
     <div class="cursor-outline"></div>
     <canvas id="matrix-bg"></canvas>
@@ -804,10 +766,10 @@
 
     <script type="module">
 //
-// MI$TA'S CORE SCRIPT v2.1
+// MI$TA'S CORE SCRIPT v2.2
 // ARCHITECT: PEPETHEFROG
 // AGENT: M. MISTARENKO
-// STATUS: REBUILT & ENHANCED
+// STATUS: ANIMATION & LAYOUT REFINED
 //
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -822,9 +784,7 @@ try {
     supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 } catch (e) {
     console.error("FATAL: Supabase client failed to initialize.", e);
-    // If Supabase fails, the site is crippled. We can show a message or just log it.
 }
-
 
 // --- DOM ELEMENTS ---
 const DOMElements = {
@@ -832,7 +792,6 @@ const DOMElements = {
     cursorOutline: document.querySelector('.cursor-outline'),
     matrixCanvas: document.getElementById('matrix-bg'),
     projectTitle: document.getElementById('project-title'),
-    // Chat
     chatIcon: document.getElementById('chatIcon'),
     chatWindow: document.getElementById('chatWindow'),
     closeChatBtn: document.getElementById('closeChatBtn'),
@@ -844,14 +803,12 @@ const DOMElements = {
     saveUsernameBtn: document.getElementById('saveUsernameBtn'),
     activeUsersCount: document.getElementById('activeUsersCount'),
     chatInputArea: document.querySelector('.chat-input-area'),
-    // News
     newsIcon: document.getElementById('newsIcon'),
     newsWindow: document.getElementById('newsWindow'),
     closeNewsBtn: document.getElementById('closeNewsBtn'),
     newsBody: document.getElementById('newsBody'),
     newsLoading: document.getElementById('newsLoading'),
     newsCountdown: document.getElementById('newsCountdown'),
-    // Brainstorm
     brainstormInput: document.getElementById('brainstormInput'),
     generateIdeaBtn: document.getElementById('generateIdeaBtn'),
     brainstormOutput: document.getElementById('brainstormOutput'),
@@ -867,7 +824,6 @@ const AppState = {
     runes: ['ᛗ', 'ᛁ', 'ᛊ', 'ᛏ', 'ᚨ', 'ᚱ', 'ᛖ', 'ᚾ', 'ᚲ', 'ᛟ', 'ᚠ', 'ᚢ', 'ᚦ', 'ᚩ', 'ᚱ', 'ᚳ', 'ᚷ', 'ᚹ', 'ᚻ', 'ᚾ', 'ᛁ', 'ᛄ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛊ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛝ', 'ᛟ', 'ᛞ'],
     typingAnimationInterval: null,
 };
-
 
 // --- MODULE: NEO CURSOR ---
 function initCursor() {
@@ -887,22 +843,18 @@ function initCursor() {
 function initMatrix() {
     const canvas = DOMElements.matrixCanvas;
     if (!canvas) return;
-
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
     const letters = 'M1$TДR3ИK0'.split('');
     const fontSize = 16;
     const columns = canvas.width / fontSize;
     const drops = Array.from({ length: columns }).fill(1);
-
     function drawMatrix() {
         ctx.fillStyle = 'rgba(1, 4, 9, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(57, 255, 20, 0.5)'; // Brighter green
+        ctx.fillStyle = 'rgba(57, 255, 20, 0.5)';
         ctx.font = `${fontSize}px monospace`;
-
         for (let i = 0; i < drops.length; i++) {
             const text = letters[Math.floor(Math.random() * letters.length)];
             ctx.fillText(text, i * fontSize, drops[i] * fontSize);
@@ -919,14 +871,12 @@ function initMatrix() {
     });
 }
 
-// --- MODULE: RUNE EFFECTS ---
-function initRuneEffects() {
-    // 1. Hover effect for the main title
+// --- MODULE: RUNE & GLITCH EFFECTS ---
+function initAdvancedTextEffects() {
     const titleElement = document.getElementById('rune-title');
     if (titleElement) {
         const originalText = titleElement.textContent;
-        titleElement.innerHTML = ''; // Clear the element
-
+        titleElement.innerHTML = '';
         originalText.split('').forEach(char => {
             const charSpan = document.createElement('span');
             charSpan.className = 'rune-char interactive-hover';
@@ -934,65 +884,85 @@ function initRuneEffects() {
             charSpan.dataset.originalChar = char;
             titleElement.appendChild(charSpan);
         });
-
         titleElement.querySelectorAll('.rune-char').forEach(span => {
             const originalChar = span.dataset.originalChar;
             let timeoutId;
-
             span.addEventListener('mouseenter', () => {
                 clearTimeout(timeoutId);
                 span.classList.add('rune');
                 span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
             });
-
             span.addEventListener('mouseleave', () => {
                 timeoutId = setTimeout(() => {
                     span.classList.remove('rune');
                     span.textContent = originalChar;
-                }, 300); // Delay before reverting
+                }, 300);
             });
         });
     }
 
-    // 2. Timed transformation for the project title
     const projectTitle = DOMElements.projectTitle;
     if (projectTitle) {
-        const originalProjectText = projectTitle.textContent;
-        let isRunic = false;
+        const originalText = projectTitle.textContent;
+        projectTitle.innerHTML = '';
+        const chars = originalText.split('');
+        chars.forEach(char => {
+            const span = document.createElement('span');
+            span.className = 'char';
+            span.textContent = char;
+            projectTitle.appendChild(span);
+        });
 
+        const charSpans = projectTitle.querySelectorAll('.char');
+        let isAnimating = false;
+
+        const animateText = (toRunes) => {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            charSpans.forEach((span, index) => {
+                setTimeout(() => {
+                    span.classList.add('glitching');
+                    
+                    setTimeout(() => {
+                        if (toRunes) {
+                             if (span.textContent.trim() !== '' && ![':', ' '].includes(span.textContent)) {
+                                span.textContent = AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
+                            }
+                        } else {
+                            span.textContent = chars[index];
+                        }
+                    }, 100);
+
+                    setTimeout(() => {
+                        span.classList.remove('glitching');
+                    }, 200);
+
+                }, index * 50);
+            });
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, charSpans.length * 50 + 200);
+        };
+
+        let isRunic = false;
         setInterval(() => {
-            if (isRunic) {
-                projectTitle.textContent = originalProjectText;
-            } else {
-                let runicText = '';
-                for (let i = 0; i < originalProjectText.length; i++) {
-                    // Keep spaces and special characters, transform letters
-                    if (originalProjectText[i].match(/[a-zA-Z0-9]/)) {
-                        runicText += AppState.runes[Math.floor(Math.random() * AppState.runes.length)];
-                    } else {
-                        runicText += originalProjectText[i];
-                    }
-                }
-                projectTitle.textContent = runicText;
-            }
             isRunic = !isRunic;
-        }, 15000); // Every 15 seconds
+            animateText(isRunic);
+        }, 10000);
     }
 }
-
 
 // --- MODULE: MOBILE MENU ---
 function initMobileMenu() {
     const hamburgerMenu = document.getElementById('hamburgerMenu');
     const mobileMenu = document.getElementById('mobileMenu');
-    
     if (!hamburgerMenu || !mobileMenu) return;
-
     hamburgerMenu.addEventListener('click', () => {
         hamburgerMenu.classList.toggle('active');
         mobileMenu.classList.toggle('active');
     });
-
     mobileMenu.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
             hamburgerMenu.classList.remove('active');
@@ -1001,11 +971,9 @@ function initMobileMenu() {
     });
 }
 
-
 // --- MODULE: CHAT ---
 function initChat() {
     if (!supabase || !DOMElements.chatIcon) return;
-
     const setupChatUI = () => {
         DOMElements.usernamePrompt.style.display = 'none';
         DOMElements.chatBody.style.display = 'flex';
@@ -1014,16 +982,13 @@ function initChat() {
         loadInitialMessages();
         listenForMessages();
     };
-
     if (AppState.username && AppState.userId) {
         setupChatUI();
     }
-
     DOMElements.chatIcon.addEventListener('click', () => DOMElements.chatWindow.classList.toggle('active'));
     DOMElements.closeChatBtn.addEventListener('click', () => DOMElements.chatWindow.classList.remove('active'));
     DOMElements.sendChatBtn.addEventListener('click', sendMessage);
     DOMElements.chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(); });
-
     DOMElements.saveUsernameBtn.addEventListener('click', () => {
         const username = DOMElements.usernameInput.value.trim();
         if (username) {
@@ -1047,10 +1012,7 @@ function displayChatMessage(username, message, isMe) {
 
 async function loadInitialMessages() {
     try {
-        const { data, error } = await supabase
-            .from('messages')
-            .select('*')
-            .order('created_at', { ascending: true });
+        const { data, error } = await supabase.from('messages').select('*').order('created_at', { ascending: true });
         if (error) throw error;
         data.forEach(msg => displayChatMessage(msg.username, msg.message, msg.user_id === AppState.userId));
     } catch (error) {
@@ -1063,14 +1025,7 @@ function initializeSupabaseChannel() {
     if (AppState.supabaseChannel) {
         AppState.supabaseChannel.unsubscribe();
     }
-    AppState.supabaseChannel = supabase.channel('chat_room', {
-        config: {
-            presence: {
-                key: AppState.userId
-            }
-        }
-    });
-
+    AppState.supabaseChannel = supabase.channel('chat_room', { config: { presence: { key: AppState.userId } } });
     AppState.supabaseChannel
         .on('presence', { event: 'sync' }, () => {
             const presenceState = AppState.supabaseChannel.presenceState();
@@ -1083,14 +1038,10 @@ function initializeSupabaseChannel() {
             DOMElements.activeUsersCount.textContent = `Активних користувачів: ${uniqueUsers.size}`;
         })
         .on('presence', { event: 'join' }, ({ newPresences }) => {
-            newPresences.forEach(p => {
-                displayChatMessage('MI$TA', `${p.username} приєднався до мережі.`, false);
-            });
+            newPresences.forEach(p => displayChatMessage('MI$TA', `${p.username} приєднався до мережі.`, false));
         })
         .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-            leftPresences.forEach(p => {
-                displayChatMessage('MI$TA', `${p.username} покинув мережу.`, false);
-            });
+            leftPresences.forEach(p => displayChatMessage('MI$TA', `${p.username} покинув мережу.`, false));
         })
         .subscribe(async (status) => {
             if (status === 'SUBSCRIBED') {
@@ -1103,7 +1054,6 @@ function initializeSupabaseChannel() {
 function listenForMessages() {
     AppState.supabaseChannel
         .on('broadcast', { event: 'chat_message' }, ({ payload }) => {
-            // Only display messages from others, as self messages are displayed immediately
             if (payload.user_id !== AppState.userId) {
                 displayChatMessage(payload.username, payload.message, false);
             }
@@ -1111,10 +1061,8 @@ function listenForMessages() {
         .subscribe();
 }
 
-
 function startTypingAnimation() {
-    stopTypingAnimation(); // Clear any existing animation
-
+    stopTypingAnimation();
     const indicatorDiv = document.createElement('div');
     indicatorDiv.id = 'mista-typing-indicator';
     indicatorDiv.classList.add('chat-message', 'other');
@@ -1122,16 +1070,12 @@ function startTypingAnimation() {
         <span class="username">MI$TA</span>
         <div style="display: flex; align-items: center; gap: 10px;">
             <div class="rune-symbols">
-                <span class="rune-char">.</span>
-                <span class="rune-char">.</span>
-                <span class="rune-char">.</span>
+                <span class="rune-char">.</span><span class="rune-char">.</span><span class="rune-char">.</span>
             </div>
             <p style="margin: 0;">очікуйте на відповідь марії...</p>
-        </div>
-    `;
+        </div>`;
     DOMElements.chatBody.appendChild(indicatorDiv);
     DOMElements.chatBody.scrollTop = DOMElements.chatBody.scrollHeight;
-
     const runeChars = indicatorDiv.querySelectorAll('.rune-char');
     AppState.typingAnimationInterval = setInterval(() => {
         runeChars.forEach(char => {
@@ -1143,39 +1087,27 @@ function startTypingAnimation() {
 function stopTypingAnimation() {
     clearInterval(AppState.typingAnimationInterval);
     const indicator = document.getElementById('mista-typing-indicator');
-    if (indicator) {
-        indicator.remove();
-    }
+    if (indicator) indicator.remove();
 }
 
 async function sendMessage() {
     const messageText = DOMElements.chatInput.value.trim();
     if (!messageText || !AppState.username) return;
-
     displayChatMessage(AppState.username, messageText, true);
     DOMElements.chatInput.value = '';
     startTypingAnimation();
-
     try {
         const response = await fetch(`${BACKEND_URL}/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: messageText, 
-                user_id: AppState.userId, 
-                username: AppState.username,
-            })
+            body: JSON.stringify({ message: messageText, user_id: AppState.userId, username: AppState.username })
         });
-        
         stopTypingAnimation();
-
         if (!response.ok) {
-            // Display a generic error from the backend if the request fails
             const errorData = await response.json().catch(() => ({ detail: 'Невідома помилка сервера.' }));
             displayChatMessage('MI$TA', `Помилка: ${errorData.detail || response.statusText}`, false);
             return;
         }
-        
         const data = await response.json();
         displayChatMessage('MI$TA', data.response, false);
     } catch (err) {
@@ -1185,17 +1117,14 @@ async function sendMessage() {
     }
 }
 
-
 // --- MODULE: NEWS ---
 function initNews() {
     if (!DOMElements.newsIcon) return;
-    const NEWS_REFRESH_INTERVAL = 10 * 60 * 60 * 1000; // 10 hours
-
+    const NEWS_REFRESH_INTERVAL = 10 * 60 * 60 * 1000;
     const updateNewsView = () => {
         const cachedNews = localStorage.getItem('mista_news_cache');
         const lastFetchTime = parseInt(localStorage.getItem('mista_news_last_fetch'), 10);
         const now = Date.now();
-
         if (cachedNews && lastFetchTime && (now - lastFetchTime < NEWS_REFRESH_INTERVAL)) {
             DOMElements.newsLoading.style.display = 'none';
             displayNews(JSON.parse(cachedNews));
@@ -1204,13 +1133,11 @@ function initNews() {
         }
         startNewsCountdown(NEWS_REFRESH_INTERVAL);
     };
-
     DOMElements.newsIcon.addEventListener('click', () => {
         const isActive = DOMElements.newsWindow.classList.toggle('active');
         if (isActive) updateNewsView();
         else clearInterval(AppState.newsUpdateTimer);
     });
-
     DOMElements.closeNewsBtn.addEventListener('click', () => {
         DOMElements.newsWindow.classList.remove('active');
         clearInterval(AppState.newsUpdateTimer);
@@ -1229,8 +1156,7 @@ function displayNews(newsItems) {
         item.innerHTML = `
             <h4>${news.title}</h4>
             <p>${news.description}</p>
-            <a href="${news.link}" target="_blank" class="interactive-hover">Джерело <i class="fas fa-external-link-alt"></i></a>
-        `;
+            <a href="${news.link}" target="_blank" class="interactive-hover">Джерело <i class="fas fa-external-link-alt"></i></a>`;
         DOMElements.newsBody.appendChild(item);
     });
 }
@@ -1275,34 +1201,27 @@ async function fetchNews() {
 }
 
 // --- MODULE: BRAINSTORM ---
-const brainstormCache = {}; // Simple session cache
-
+const brainstormCache = {};
 function initBrainstorm() {
     if (!DOMElements.generateIdeaBtn) return;
-
     DOMElements.generateIdeaBtn.addEventListener('click', async () => {
         const prompt = DOMElements.brainstormInput.value.trim();
         if (!prompt) {
             DOMElements.brainstormOutput.textContent = "Порожнеча не надихає. Введіть концепцію.";
             return;
         }
-
         if (!AppState.userId) {
             DOMElements.brainstormOutput.textContent = "Будь ласка, введіть свій позивний у чаті, щоб використовувати Мозковий Штурм.";
             return;
         }
-
-        // Check cache first
         if (brainstormCache[prompt]) {
             DOMElements.brainstormOutput.textContent = brainstormCache[prompt];
             console.log("Brainstorm response from cache.");
             return;
         }
-
         DOMElements.brainstormOutput.textContent = "Підключаюся до ноосфери...";
         DOMElements.brainstormOutput.classList.add('loading');
         DOMElements.generateIdeaBtn.disabled = true;
-
         try {
             const response = await fetch(`${BACKEND_URL}/brainstorm`, {
                 method: 'POST',
@@ -1315,11 +1234,8 @@ function initBrainstorm() {
                 return;
             }
             const data = await response.json();
-            
-            // Store in cache and display
             brainstormCache[prompt] = data.response;
             DOMElements.brainstormOutput.textContent = data.response;
-
         } catch (error) {
             console.error("Brainstorm error:", error);
             DOMElements.brainstormOutput.textContent = "Помилка генерації. Схоже, ідеї сьогодні страйкують.";
@@ -1330,18 +1246,17 @@ function initBrainstorm() {
     });
 }
 
-
 // --- APP INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("M.I.S.T.A. consciousness initializing...");
+    console.log("M.I.S.T.A. consciousness initializing... v2.2");
     initCursor();
     initMatrix();
-    initRuneEffects();
+    initAdvancedTextEffects();
     initMobileMenu();
     initChat();
     initNews();
     initBrainstorm();
-    console.log("System online. Welcome, Architect.");
+    console.log("System online. Refinements complete. Welcome, Architect.");
 });
     </script>
 </body>
